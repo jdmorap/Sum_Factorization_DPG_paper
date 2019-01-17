@@ -1,0 +1,32 @@
+%!TEX root = main.tex
+
+\section{Introduction}
+
+\subsection{Motivation}
+Numerical simulation of high frequency wave propagation is one of the most studied fields in computational science. Applications in geomechanics,  electromagnetic scattering, sonic tools and optics, require accurate but, at the same time, efficient discretization methods. In this paper, we are mostly interested in waves which are characterized by local behavior, such as non-diffracting pulses and beams \cite{nondiffr}, where the numerical simulation would benefit a lot from an adaptive method. These kind of waves are very essential in many applications such as modeling of lasers and LIDARs (Light Detection And Ranging), communications in free space, electromagnetic tweezers, etc. 
+
+
+\subsection{Standard Finite Element method (FEM)}
+The standard FEM is a widely used numerical method for the solution of boundary value problems (BVPs). However, when it comes to the simulation of harmonic waves, especially for high frequency simulations in heterogeneous media and complex geometries, one  has to deal with many challenges. First of all, standard FEM suffers from the so called ``pollution'' effect \cite{Babuska1}. This is the phenomenon where, as the frequency increases, the computed wave increasingly differs from the best approximation. Secondly, for highly oscillatory waves, a large number of grid points have to be used in order to resolve short wavelengths in a relatively large domain, and this results in a computationally intractable problem. Moreover, the resulting linear system is indefinite and that makes its solution more challenging. Lastly, due to the lack of pre-asymptotic stability, usual adaptive algorithms have very poor performance until the mesh is sufficiently fine. These are the main challenges which DPG tries to overcome. 
+
+\subsection{Properties of the DPG method} 
+
+As in standard Galerkin methods, DPG starts from a BVP. The usual procedure is to multiply an equation by a test function and integrate over the domain of interest. By integrating by parts, we then pass derivatives from the trial to the test functions and built the boundary conditions into the formulation (relaxation). In the case of the acoustics problem one has a system of first order equations; conservation of mass and conservation of linear momentum (see Eq. \ref{eq1}). Depending on with which norm one seeks to measure convergence, the equations can be relaxed in different ways: a) the \textit{trivial} or \textit{strong} formulation where no equation is relaxed, b) the \textit{classical} formulation where the momentum equation is relaxed , c) the \textit{mixed} formulation where the conservation of mass equation is relaxed and finally d) the \textit{ultraweak} formulation where both equations are relaxed. In the same way as demonstrated in \cite{demk_varform,Carstensen,MR3543022}, it can be shown that the four formulations are simultaneously well or ill posed. The standard Galerkin method can only deal with a symmetric functional setting (where the trial and test spaces are the same), and this makes it suitable only for the classical and the mixed formulations. Moreover, standard FEM is only asymptotically stable, i.e., the mesh has to be fine enough to overcome the pollution effect. This brings us to the concept of the \textit{optimal test functions}.
+% 
+Discretization of a well posed continuous problem doesn't always guarantee discrete stability. The discrete problem is well posed if and only if 
+Babu\v{s}ka's \textit{discrete inf-sup} condition holds \cite{babuska}. An arbitrary choice of the discrete test space often leads to lack of stability. On the contrary, in the case of the DPG method, one computes on the fly the optimal test functions which realize the supremum of the \textit{inf-sup} condition \cite{dpg_opt}. We obtain then a Petrov-Galerkin scheme with the optimal test space for which discrete stability is guaranteed even in the pre-asymptotic region.
+% 
+DPG can also be viewed as a minimum residual method, where one minimizes the residual in the dual norm to the test space norm. Consequently, the resulting stiffness matrix is always Hermitian and positive definite, making the use of Conjugate Gradient (CG) ideal. 
+% 
+Lastly, DPG can be interpreted as a mixed method where one solves simultaneously for the solution and the Riesz representation of the residual. The existence of a built-in error indicator and the aforementioned stability properties suggest the use of automatic $hp$-adaptivity, starting from very coarse meshes.
+% 
+% 
+\subsection{Organization of the paper}
+
+In the following section, we give a more detailed overview of the DPG method. We then give an example of a high frequency wave propagation problem (scattering by a resonating cavity) and describe the proposed solver. We conclude our paper with some results on the solver and a discussion of future steps.
+
+
+
+
+
+

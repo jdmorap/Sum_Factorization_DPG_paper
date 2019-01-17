@@ -1,0 +1,176 @@
+\documentclass[10pt]{article}%Default is US letter size paper
+
+%--------------------------------------------------------------------------------
+%--------------------------------------------------------------------------------
+\pdfoutput=1 %For arXiv.org - usually not necessary
+\usepackage[top=1.3in,bottom=1.2in,left=1in,right=1in]{geometry}%Same margins Demkowicz proposed
+%These three ams packages loaded in this order give ALL the ams stuff
+\usepackage{amsmath}%Includes amstext, amsbsy and amsopn (should be loaded before amsthm)
+\usepackage{amssymb}%Includes amsfonts
+\usepackage{amsthm}%For theorem and other math environments
+\allowdisplaybreaks[4]
+\usepackage{mathtools}%Some tools including inclusion arrow
+\usepackage[only,llbracket,rrbracket]{stmaryrd}%A few extra math symbols
+%\usepackage[scr=boondoxo]{mathalfa} %Cool package to customize \mathcal,\mathbb,\mathscr,\mathfrak
+\usepackage[english]{babel}%Correct word-splitting
+%\usepackage{times}%Change font
+\usepackage{graphicx}%To add figures
+\usepackage[font=small,figurewithin=section]{caption}%Gives extra options for caption (e.g. smaller fonts)
+\usepackage{subcaption}%For subfloats. Requires caption package!
+\usepackage{float}%To place a float exactly at a point (using H instead of !ht)
+%\usepackage[authoryear]{natbib}%For Harvard referencing within text
+\usepackage[numbers]{natbib} %For Vancouver referencing within text
+\usepackage{hyperref}%For referencing - WARNING: If math titles needed use \texorpdfstring{$L^2$}{L2}
+\usepackage[all]{xy}%For commuting diagrams
+\usepackage{multirow}%For tables
+\usepackage{array}%For tables
+\usepackage{enumitem}%For itemized lists
+\usepackage{tikz}%For some graphics stuff if required
+\usetikzlibrary{matrix,arrows,decorations.pathmorphing}
+\usepackage{color}%For customized symbols (see preamble)
+\usepackage{authblk}%For author affiliations in title (innecessary if using elsarticle document class)
+%\usepackage{siunitx}%For scientific notation
+\usepackage[mathscr]{euscript}%For scr font
+%\extrafloats{100}
+% 
+\DeclareMathSizes{10}{10}{6}{4}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+% \usepackage{etoolbox}
+
+% \makeatletter
+% % start with some helper code
+% % This is the vertical rule that is inserted
+% \newcommand*{\algrule}[1][\algorithmicindent]{%
+%   \makebox[#1][l]{%
+%     \hspace*{.2em}% <------------- This is where the rule starts from
+%     \vrule height .75\baselineskip depth .25\baselineskip
+%   }
+% }
+
+% \newcount\ALG@printindent@tempcnta
+% \def\ALG@printindent{%
+%     \ifnum \theALG@nested>0% is there anything to print
+%     \ifx\ALG@text\ALG@x@notext% is this an end group without any text?
+%     % do nothing
+%     \else
+%     \unskip
+%     % draw a rule for each indent level
+%     \ALG@printindent@tempcnta=1
+%     \loop
+%     \algrule[\csname ALG@ind@\the\ALG@printindent@tempcnta\endcsname]%
+%     \advance \ALG@printindent@tempcnta 1
+%     \ifnum \ALG@printindent@tempcnta<\numexpr\theALG@nested+1\relax
+%     \repeat
+%     \fi
+%     \fi
+% }
+% % the following line injects our new indent handling code in place of the default spacing
+% \patchcmd{\ALG@doentity}{\noindent\hskip\ALG@tlm}{\ALG@printindent}{}{\errmessage{failed to patch}}
+% \patchcmd{\ALG@doentity}{\item[]\nointerlineskip}{}{}{} % no spurious vertical space
+% % end vertical rule patch for algorithmicx
+
+
+%Spacing. 10pt font has baselineskip=12pt, 11pt font has baselineskip=13.6pt, 12pt font has baselineskip=14.5pt
+\linespread{1.176} %Higher spacing =16pt if font is 11pt (because baselineskip is 13.6pt)
+\setlength{\parskip}{0.294\baselineskip}%Break after paragraph =4pt if font is 11pt (because baselineskip is 13.6pt)
+
+%Sectioning, numbering and TOC (Table of Contents)
+\numberwithin{equation}{section}%Number equations per section
+\setcounter{tocdepth}{2}%List up to 3 levels in TOC
+\makeatletter%Have bold math in titles, but not in TOC
+\g@addto@macro\bfseries{\boldmath}
+\makeatother
+
+%For caption
+\captionsetup{belowskip=-10pt}%Reduce space after caption in figures
+
+%Bibliography natbib options
+% \bibpunct{(}{)}{;}{a}{,}{,}
+
+%For hyperref
+\hypersetup{colorlinks=true,citecolor=black,filecolor=black,linkcolor=black,urlcolor=black}
+\hypersetup{pdfstartview=FitB,pdfpagemode=UseNone}
+
+%For enumitem
+\setlist{nolistsep}
+
+%For tables - fix width of column while maintaining alignment
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{N}{@{}m{0pt}@{}}
+
+%For stmaryrd
+\SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n}
+%--------------------------------------------------------------------------------
+%--------------------------------------------------------------------------------
+
+
+\input{preamble}
+
+\begin{document}
+
+
+%*************************************************title and abstract
+
+%% FOR ARTICLE CLASS
+% \title{\vspace*{-35pt}Tensorization applied to numerical integration in DPG}
+\title{\vspace*{-35pt}Fast integration of DPG matrices based on sum factorization\\ for all the energy spaces}
+% \title{\vspace*{-35pt}Fast integration of DPG matrices based on tensorization in all the spaces of the 3D exact sequence}
+\author{Jaime Mora\thanks{Corresponding author. E-mail: jmorapaz@ices.utexas.edu}\ }
+\author{Leszek Demkowicz}
+\affil{Institute for Computational Engineering and Sciences (ICES),\\ The University of Texas at Austin, 201 E 24th St, Austin, TX 78712, USA}
+\date{}
+
+%****************************************abstract and TOC
+% \newpage
+\maketitle
+%\pagenumbering{roman}
+\input{abstract}
+
+% \newpage
+% \tableofcontents
+%*************************************************content
+%Section 1
+% \newpage
+%\pagenumbering{arabic}
+\input{1_Introduction}
+%Section 2
+% \newpage
+\input{2_Tensorization}
+%Section 3
+% \newpage
+\input{3_Application}
+%Section 4
+% \newpage
+\input{4_Conclusions}
+
+
+%%References
+%%\newpage
+%\phantomsection%For hyperref
+%\addcontentsline{toc}{section}{References}
+%%\bibliographystyle{kbib}
+\bibliographystyle{apalike}
+\bibliography{main}
+
+%%Appendices
+%\appendix
+%\newpage
+%\pagenumbering{arabic}% resets counter to 1
+%\renewcommand*{\thepage}{\thesection-\arabic{page}}%Custom numbering
+%% Appendix A
+%\input{A1}
+%% \newpage
+%% Appendix B
+%\input{A2}
+%% \newpage
+%% Appendix C
+%\input{A3}
+%% \newpage
+%% Appendix D
+%\input{A4}
+
+
+\end{document}

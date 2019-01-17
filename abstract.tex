@@ -1,0 +1,13 @@
+%!TEX root = main.tex
+%Large font for abstract
+\renewcommand{\abstractname}{\large Abstract}
+\begin{abstract}
+%\normalsize %Text normal size in abstract
+\small %Text small size in abstract
+\noindent
+
+Numerical integration of the stiffness matrix in higher order finite element (FE) methods is recognized as one of the heaviest computational tasks in a FE solver. The problem becomes even more relevant when computing the Gram matrix in the algorithm of the Discontinuous Petrov Galerkin (DPG) FE methodology. Making use of 3D tensor-product shape functions, and the concept of sum factorization, known from standard high order FE and spectral methods, here we take advantage of this idea for the entire exact sequence of FE spaces defined on the hexahedron. The key piece to the presented algorithms is the exact sequence for the one-dimensional element, and use of hierarchical shape functions.
+Consistent with existing results, the presented algorithms for the integration of $H^1$, $H(\curl)$, $H(\div)$, and $L^2$ inner products, have the $\mcO(p^7)$ computational complexity in contrast to the $\mcO(p^9)$ cost of conventional integration routines. 
+Use of Legendre polynomials for shape functions is critical in this implementation. Three boundary value problems under different variational formulations, requiring combinations of $H^1$, $H(\div)$ and $H(\curl)$ test shape functions, were chosen to experimentally assess the computation time for constructing DPG element matrices, showing good correspondence with the expected rates.
+
+\end{abstract}

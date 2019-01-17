@@ -1,0 +1,103 @@
+\documentclass[11pt,c]{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+% \usepackage{mathrsfs}
+% \usepackage[draft]{graphicx}
+\usepackage{graphicx}
+
+\usepackage[english]{babel}
+\usepackage{times}
+\usepackage{a4wide}
+\usepackage{float}
+\usepackage[numbers]{natbib}
+% \usepackage{showlabels}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+%\usepackage{tikz-cd}
+\usepackage[all,cmtip]{xy}
+\usepackage{caption}
+\usepackage{subcaption}
+% \captionsetup[figure]{labelformat=empty}% redefines the caption setup of the figures environment in the beamer class.
+
+\input{my_preamble}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+
+
+
+% COLORS
+\def\Reddd{\special{color rgb  1.   0.   0.}}
+\def\Black{\special{color cmyk 0.   0.   0    1.}}
+\let\B\Black
+\let\Rd\Reddd
+
+
+
+
+\catcode`@=12
+
+             \topmargin 0.0in      %(TOP)  1"
+             \oddsidemargin 0.0in  %(LEFT) 1"
+             \textwidth 6.5in      %(RIGHT)1"
+             \textheight 8.5in     %(BOT)  1"
+             \headsep 0.0in
+             \headheight 0.0in
+
+
+
+\newcommand{\PT}{{\partial T}}
+\newcommand{\sth}{{\textsuperscript{th}}~}
+
+\let\tilde\widetilde
+
+\setcounter{secnumdepth}{5}
+\begin{document}
+
+\begin{center}
+
+
+{\huge {\bf
+An Adaptive DPG Method for High Frequency Time-harmonic Wave Propagation Problems
+\\}}
+% \vspace*{1cm}
+
+\vspace*{0.9cm}
+{\Large
+Socratis Petrides, Leszek F. Demkowicz
+
+\vspace*{.5cm}
+
+{\bf Institute for
+Computational Engineering and Sciences\\
+The University of Texas at Austin, Austin, TX 78712, USA\\}
+}
+\end{center}
+
+
+\begin{abstract}
+
+The Discontinuous Petrov-Galerkin (DPG) method for high frequency wave propagation problems is discussed. The DPG method offers uniform pre-asymptotic stability for any wavenumber. This allows for a fully automatic adaptive $hp$ algorithm, that can start from very coarse meshes. Moreover, DPG always delivers a Hermitian positive definite system, suggesting the use of the Conjugate Gradient algorithm for its solution. We present a new iterative solution scheme which benefits from these attractive properties of DPG. This novel solver is integrated within the adaptive procedure by constructing a two-grid-like preconditioner for the Conjugate Gradient method that  exploits information from previous meshes. The construction of such a preconditioner is discussed, and an example for a 2D acoustics problem is presented. Our results show that the proposed iterative algorithm converges at a rate independent of the mesh and the wavenumber.
+
+
+\end{abstract}
+\textbf{Keywords:} discontinuous test functions, finite elements, adaptivity, Petrov-Galerkin method, multigrid, preconditioner, iterative solvers
+\baselineskip=16pt
+\parskip= 4pt
+%*************************************************page 1
+\input{intro}
+% \newpage
+% \paragraph*{Acknowledgments.}
+\newpage
+
+\bibliography{bib}
+\bibliographystyle{apalike}
+\newpage
+\appendix
+\pagenumbering{arabic}
+\renewcommand*{\thepage}{\thesection~\arabic{page}}
+
+\end{document}
+

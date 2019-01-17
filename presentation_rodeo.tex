@@ -1,0 +1,257 @@
+% This text is proprietary.
+% It's a part of presentation made by myself.
+% It may not used commercial.
+% The noncommercial use such as private and study is free
+% Sep. 2005 
+% Author: Sascha Frank 
+% University Freiburg 
+% www.informatik.uni-freiburg.de/~frank/
+%
+% additional usepackage{beamerthemeshadow} is used
+\documentclass{beamer}
+\usepackage{beamerthemeshadow}
+\usepackage{hyperref}
+\usepackage{color}
+% \usepackage{datetime}
+% \usepackage[useregional]{datetime2}
+% \usepackage[USenglish]{babel}
+% \newcommand{\mydate}{\formatdate{3}{4}{2017}}
+
+
+\title[Fast quadrature for DPG]{Fast quadrature implementation for Discontinuous Petrov Galerkin (DPG)}
+\subtitle{ }
+\author{Jaime David Mora}
+\institute{ICES - The University of Texas at Austin}
+\date[FE Rodeo 2017] % (optional)
+{Finite Element Rodeo, March 3-4 2017}
+\titlegraphic{\includegraphics[width=0.5\textwidth,height=.1\textheight]{ices_fig.eps}}
+
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\begin{document}
+% \title{Fast quadrature implementation for Discontinuous Petrov Galerkin (DPG)}
+% \author{Jaime Mora}
+
+\frame{\titlepage} 
+
+\frame{\frametitle{Table of contents}\tableofcontents} 
+
+
+\section{Motivation} 
+\frame{ \frametitle{Sum factorization}
+\begin{itemize}
+\item In tensor-product 3D shape functions (e.g. hexahedral elements) decomposition into their 1D generating functions provides the chance to reorganize the quadrature and thus reduce the computational cost.
+\item The theoretical cost improvement consists of going from $\mathpzc{O}((p+1)^9)$ to $\mathpzc{O}((p+1)^7)$ FLOPs.
+\item This technique requires a symmetric setting in order to be taken profit the most. This is because a single call to each of the 1D-associated shape function subroutine is needed to get both the trial and test components of any matrix entry.
+\item In DPG, the Gram matrix fulfills this condition, having the enriched test space functions both as test and trial components.
+\end{itemize}
+}
+
+
+\section{Description of the sum factorization technique} 
+
+\frame{\frametitle{Overview of sum factorization for Helmholtz equation}
+ \footnotesize{The Helmholtz equation, in its discretized variational generates a matrix with the following entries:}
+ \begin{figure}
+  \centering
+  \includegraphics[width=7cm]{matrix_entry_xi.png}  
+ \end{figure}
+ \footnotesize{where D is a symmetric matrix depending on the jacobian:}
+\begin{figure}
+  \centering
+  \includegraphics[width=2.2cm]{defD.png}  
+ \end{figure}
+ \footnotesize{Integration of the matrix entries by quadrature:}
+ \begin{figure}
+  \centering
+  \includegraphics[width=9cm]{quadrature.png}  
+ \end{figure}
+}
+
+\frame{\frametitle{Overview of sum factorization for Helmholtz equation}
+ \footnotesize{Classic algorithm of numerical integration:}
+ \begin{figure}
+  \centering
+  \includegraphics[width=8.5cm]{classic_algo.png}  
+ \end{figure}
+}
+
+\frame{\frametitle{Overview of sum factorization for Helmholtz equation}
+\footnotesize{The 3D basis function is decomposed into the three 1D basis function:}
+\begin{figure}
+  \centering
+  \includegraphics[width=4.7cm]{phi123.png}  
+ \end{figure}
+ \footnotesize{Using symmetry of D we will be able to expand:}
+ \begin{figure}
+  \centering
+  \includegraphics[width=5cm]{D_entries.png}  
+ \end{figure}
+ \footnotesize{And the coefficient of the mass term is the following:}
+\begin{figure}
+  \centering
+  \includegraphics[width=1.4cm]{defE.png}  
+ \end{figure}
+ }
+
+\frame{\frametitle{Overview of sum factorization for Helmholtz equation}
+\footnotesize{Expansion of the integrand:}
+\begin{figure}
+  \centering
+  \includegraphics[width=4cm]{expansion.png}  
+ \end{figure}
+ \footnotesize{Factorization:}
+ \begin{figure}
+  \centering
+  \includegraphics[width=3.5cm]{factorization.png}  
+ \end{figure}
+}
+
+\frame{\frametitle{Overview of sum factorization for Helmholtz equation}
+ \footnotesize{Optimized structure for integration of the factorized form:}
+ \begin{figure}
+  \centering
+  \includegraphics[width=7cm]{Baux.png}  
+ \end{figure}
+
+ \footnotesize{where $B^{aux,1}_n\ (n=1,...,4)$ are arrays of integrals over $\xi_2$, which in turn are given as a function of $B^{aux,2}_m\ (m=1,...,8)$, arrays of integrals over $\xi_3$.}
+}
+
+\frame{\frametitle{Pseudocode on Helmholtz equation}
+\footnotesize{
+for each $\xi_1,\ i_3,j_3$ \\
+\ \ \ \ set $B^{aux1}=0$ \\
+\ \ \ \ for each $\xi_2$ \\
+\ \ \ \ \ \ \ \ set $B^{aux2}=0$ \\
+\ \ \ \ \ \ \ \ for each $\xi_3$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ accumulate for $B^{aux2}=B^{aux2}(\xi_2,i_3,j_3,\xi_1)$ \\
+\ \ \ \ \ \ \ \ for each $i_2,\ j_2$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ accumulate for $B^{aux1}=B^{aux1}(i_2,j_2,i_3,j_3,\xi_1)$ \\
+\ \ \ \ for each $i_2,\ j_2$ \\
+\ \ \ \ \ \ \ \ for each $i_1,\ j_1$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ accumulate for $B_{IJ}=B^{aux}(i_1,i_2,i_3,j_1,j_2,j_3)$ \\
+end}
+}
+
+\frame{\frametitle{Considerations for DPG}
+\begin{itemize}
+\item $p$:\ \ \ \ \ \ \ \ \ trial space approximation order.\\
+$p+\Delta p$:\ enriched test space order
+\item $k$ is the problem-dependent number of d.o.f.: $k=1$ for Poisson, $k=3$ for Primal Linear Elasticity, $k=6$ for Ultraweak Linear Elasticity
+\item Element Gram matrix is of size $[k(p+\Delta p +1)]^2$ making it the largest array to compute within the \textbf{elem} subroutine.
+\item Stiffness matrix is of size $k(p+\Delta p +1)\times k(p+1)$. Sum factorization is not applicable.
+\item However, test and trial functions are already evaluated.
+\item Their values may be reused to get Stiffness matrix and load vector within the Gram matrix's sum factorization algorithm
+\end{itemize}
+}
+\section{Application example}
+\frame{
+  \frametitle{Elasticity Primal DPG - Sum Factorization on Gram Matrix}
+  \footnotesize{
+  \begin{itemize}
+    \item $\Phi_I(\xi)\in V^{enr}(\Omega_e)=(H^1(\Omega^e))^3$\\ \\
+    \pause
+    \item $\Rightarrow\Phi_I(\xi)=(\phi_i(\xi))_\alpha=(\chi_{i1}(\xi_1)\chi_{i2}(\xi_2)\chi_{i3}(\xi_3))_\alpha$
+    \pause
+    \item $G^e_{IJ}=(\Phi_I,\Phi_J)_{V^{enr}(\Omega^e)}=(\Phi_I,\Phi_J)_{(H^1(\Omega^e))^3}$
+    \pause
+    \item $G^e_{IJ}=\int_{\Omega_e}\left(\nabla\Phi_I : \nabla\Phi_J\right+\Phi_I\cdot\Phi_J) d\Omega$
+    \pause
+    \item $G^e_{IJ}=\int_0^1\int_0^1\int_0^1\left[\left(\mathpzc{J}^{-T}\nabla_{\xi}\Phi_I\right) : \left(\mathpzc{J}^{-T}\nabla_{\xi}\Phi_J\right)+ \Phi_I\cdot\Phi_J\right] det(\mathpzc{J}) d\xi_3d\xi_2d\xi_1$ \\ \\
+    \pause
+    \item $G^e_{IJ}=\int_0^1\int_0^1\int_0^1\left[\left(\mathpzc{J}^{-T}\nabla_{\xi}\phi_i\right) \cdot \left(\mathpzc{J}^{-T}\nabla_{\xi}\phi_j\right)+ \phi_i\phi_j\right] \delta_{\alpha\beta}det(\mathpzc{J}) d\xi_3d\xi_2d\xi_1$ \\ \\
+    \pause
+    \item Same as Helmholtz case with $E=-det(\mathpzc{J})$ and taking into account the vector coordinates when multiplying by $\delta_{\alpha\beta}$
+  \end{itemize}
+  }
+}
+\frame{\frametitle{Pseudocode for primal elasticity including K and f}
+\footnotesize{
+for each $\xi_1,\ i_3,j_3$ \\
+\ \ \ \ set $B^{aux1}=0$ \\
+\ \ \ \ for each $\xi_2$ \\
+\ \ \ \ \ \ \ \ set $B^{aux2}=0$ \\
+\ \ \ \ \ \ \ \ for each $\xi_3$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ accumulate for $B^{aux2}=B^{aux2}(\xi_2,i_3,j_3,\xi_1)$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{red}{call getf,shap3H,geom3D} \\
+\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{red}{accumulate f} \\
+\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{red}{for each trial space function} \\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{red}{accumulate K} \\
+\ \ \ \ \ \ \ \ for each $i_2,\ j_2$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ accumulate for $B^{aux1}=B^{aux1}(i_2,j_2,i_3,j_3,\xi_1)$ \\
+\ \ \ \ for each $i_2,\ j_2$ \\
+\ \ \ \ \ \ \ \ for each $i_1,\ j_1$ \\
+\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{red}{for each $\alpha,\ \beta$=1,2,3; if $\alpha=\beta$} \\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ accumulate for $G_{IJ}=B^{aux}(i_1,i_2,i_3,j_1,j_2,j_3)$ \\
+end}
+}
+
+
+\section{Results} 
+
+\frame{\frametitle{Linear Elasticity - Gram matrix computing time}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{p (trial)} & \textbf{Regular integration} & \textbf{Sum factorization} \\
+\hline
+1 & $2.724\times 10^{-3}$   & $2.794\times 10^{-3}$ \\
+\hline
+2 & $4.951\times 10^{-3}$   & $3.991\times 10^{-3}$ \\
+\hline
+3 & $2.445\times 10^{-2}$   & $7.048\times 10^{-3}$ \\
+\hline
+4 & $0.117166$   & $1.4758\times 10^{-2}$ \\
+\hline
+5 & $0.470836$   & $3.4624\times 10^{-2}$ \\
+\hline
+6 & $4.205$   & $3.8806\times 10^{-2}$ \\
+\hline
+\end{tabular}}
+
+
+\frame{\frametitle{Linear Elasticity - Gram matrix computing time}
+\begin{figure}
+  \centering
+  \includegraphics[width=8.5cm]{ela_gram1.eps}  
+ \end{figure}
+}
+
+
+\frame{\frametitle{Linear Elasticity - elem() subroutine runtime}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{p (trial)} & \textbf{Regular integration} & \textbf{Sum factorization} \\
+\hline
+1 & $7.6\times 10^{-3}$   & $7.7\times 10^{-3}$ \\
+\hline
+2 & $2.42\times 10^{-2}$   & $1.98\times 10^{-2}$ \\
+\hline
+3 & $0.165$   & $0.1191$ \\
+\hline
+4 & $0.984$   & $0.797$ \\
+\hline
+5 & $6.90$   & $4.20$ \\
+\hline
+\end{tabular}}
+\section{Conclusions}
+\frame{\frametitle{Conclusions}
+\begin{itemize}
+\item An efficient technique for speeding up computation of DPG matrices for hexahedral elements is presented.
+\item The integration time is decreased and in fact the whole runtime of the element subroutine shows considerable time saving for higher orders.
+\item The integration time reduction also helps when computing errors and residuals, whether it is to evaluate error convergence or apply adaptive refinement.
+\item The adaptation of this technique to more problems with different variational formulations will be investigated.
+\end{itemize}
+}
+
+\frame{\frametitle{References}
+\begin{enumerate}
+\item Jason Patrick Kurtz, Fully Automatic hp-Adaptivity for Acoustic and Electromagnetic Scattering in Three Dimensions. The University of Texas at Austin. PhD dissertation, May 2007.
+\item Leszek Demkowicz, Jay Gopalakrishnan; Discontinuous Petrov-Galerkin (DPG) Method, ICES REPORT 15-20, The Institute for Computational Engineering and Sciences, The University of Texas at Austin, October 2015.
+\item Brendan Keith, Federico Fuentes, Leszek Demkowicz; The DPG methodology applied to different variational formulations of linear elasticity, Computer Methods in Applied Mechanics and Engineering, Volume 309, 1 September 2016, Pages 579-609.
+\end{enumerate}
+
+}
+
+\frame{\ \ \ \ \ \ \ \LARGE{THANKS FOR YOUR ATTENTION}}
+
+\end{document}
+

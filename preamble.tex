@@ -1,0 +1,458 @@
+%!TEX root = main.tex
+%Shortcut commands, custom symbols.
+
+\newcommand{\R}{\mathbb{R}} % Real numbers
+\newcommand{\N}{\mathbb{N}} % Natural numbers
+\newcommand{\C}{\mathbb{C}} % Complex numbers
+\newcommand{\F}{\mathbb{F}} % arbitrary field
+\newcommand{\zI}{\mathrm{i}} % imaginary i
+\newcommand{\cond}{\mathrm{cond}} % condition number
+\newcommand{\RBM}{\mathbb{T}} % Rigid body motions
+\newcommand{\HSo}{H} % Hilbert Sobolev space
+\newcommand{\bHSo}{\boldsymbol{H}} % (bold) Hilbert Sobolev space
+\newcommand{\Leb}{L} % Lebesgue space
+\newcommand{\bLeb}{\boldsymbol{L}} % (bold) Lebesgue space
+\newcommand{\poly}{\mathcal{P}} % Polynomial space
+\newcommand{\Sym}{\mathbb{S}} % Symmetric matrices
+\newcommand{\Skw}{\mathbb{A}} % Skew-symmetric matrices
+\newcommand{\Mat}{\mathbb{M}} % Matrices
+\newcommand{\idmap}[1]{\mathrm{id}_{#1}}
+\newcommand{\idmatrix}{\textup{\uppercase\expandafter{\romannumeral 1}}}
+\newcommand{\Vct}{\R^2} % Vectors
+% \newcommand{\Vct}{\mathbb{V}} % Vectors
+\newcommand{\mesh}{\mathcal{T}} % Mesh / open partition
+\DeclareMathOperator{\dd}{d} % Differential
+% \newcommand{\dd}{\,\mathrm{d}} % Differential
+\newcommand{\T}{\mathsf{T}} % Transpose
+% \newcommand{\T}{\mathsf{T}} % Transpose
+\newcommand{\bdry}{\partial} % Boundary
+\newcommand{\tr}{\mathrm{tr}} % Trace
+\newcommand{\Tr}{\mathrm{Tr}} % Matrix trace
+\newcommand{\Cof}{\mathrm{Cof}} % Cofactor
+\newcommand{\Det}{\mathrm{Det}} % Cofactor
+\newcommand{\opt}{\mathrm{opt}} % Optimal signifier
+\newcommand{\nopt}{\mathrm{n\text{-}opt}} % Near-optimal signifier
+\newcommand{\modif}{\mathrm{mod}} % modified signifier
+\newcommand{\partic}{\mathrm{part}} % particular signifier
+\newcommand{\comm}{\circlearrowright} % Commutative signifier
+% \newcommand{\comm}{\mathrm{comm}} % Commutative signifier
+\newcommand{\popt}{\mathrm{psd.}} % Pseudo-optimal signifier
+\newcommand{\gph}{\mathrm{graph}} % Pseudo-optimal signifier
+\newcommand{\enr}{\mathrm{enr}} % enriched signifier
+\newcommand{\res}{\mathrm{res}} % Residual signifier
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+% \newcommand{\bomega}{\fkw}
+\newcommand{\bomega}{\boldsymbol{\omega}}
+\newcommand{\bpsi}{\boldsymbol{\psi}}
+\newcommand{\bsigma}{\boldsymbol{\sigma}}
+\newcommand{\btau}{\boldsymbol{\tau}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+
+
+\DeclareMathOperator{\eps}{\boldsymbol{\varepsilon}}
+\DeclareMathOperator{\nab}{\boldsymbol{\nabla}}
+
+\DeclareMathOperator{\Riesz}{\mathscr{R}} % Riesz map
+\newcommand{\BOp}{\mathscr{B}} % PDE operator
+\DeclareMathOperator{\Proj}{\mathscr{P}} % Orthogonal projection
+\DeclareMathOperator{\tLie}{\mathfrak{L}} % Lie derivative
+\DeclareMathOperator{\aLie}{\mathcal{L}}  % autonomous Lie derivative
+\DeclareMathOperator*{\spann}{span}
+\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\curl}{curl}
+\let\div\relax %Redefine div as divergence instead of division sign
+\DeclareMathOperator{\div}{div}
+% \DeclareMathOperator{\div}{\nab\cdot}
+
+%% Oldroyd-B
+\newcommand{\veloc}{\mathbf{u}} % velocity
+\newcommand{\tveloc}{\mathbf{v}} % test velocity
+\newcommand{\trveloc}{\hat{\veloc}} % trace of velocity
+\newcommand{\estens}{\mathbf{T}} % extra stress tensor
+\newcommand{\testens}{\mathbf{S}} % test extra stress tensor
+% \newcommand{\esflux}{\hat{\estens}_{\veloc\cdot\nml}} % flux in extra-stress tenosor
+\newcommand{\esflux}{\hat{\mathbf{j}}} % flux in extra-stress tenosor
+\newcommand{\velgrad}{\mathbf{L}} % velocity gradient
+\newcommand{\tvelgrad}{\mathbf{M}} % test velocity gradient
+\newcommand{\idtens}{\mathbf{I}} % contravariant identity
+\newcommand{\Cstress}{\boldsymbol{\sigma}} % Cauchy stress
+\newcommand{\csflux}{\hat{\mathbf{t}}} % flux of Cauchy stress
+% \newcommand{\csflux}{\hat{\Cstress}_\nml} % flux of Cauchy stress
+\newcommand{\press}{p} % pressure
+\newcommand{\tpress}{q} % test pressure
+\newcommand{\force}{\mathbf{f}} % body force
+\newcommand{\mdens}{\rho} % mass density
+\newcommand{\svisc}{\eta_\mathrm{S}} % solvent viscosity 
+\newcommand{\pvisc}{\eta_\mathrm{P}} % polymeric viscosity
+\newcommand{\Weiss}{\mathrm{Wi}} % Weissenberg number
+\newcommand{\Deborah}{\mathrm{De}} % Deborah number
+\newcommand{\Reynolds}{\mathrm{Re}} % Reynolds number
+\newcommand{\Giesekus}{\alpha} % Giesekus parameter number
+
+%% Advection-diffusion
+\newcommand{\Peclet}{\mathrm{Pe}} % Peclet number
+
+
+%% Elasticity
+\newcommand{\SEfun}{\Psi} % strain-energy function
+\newcommand{\defgrad}{\boldsymbol{F}} % deformation gradient
+\newcommand{\rCG}{\boldsymbol{C}} % right Cauchy-Green strain tensor
+\newcommand{\lCG}{\boldsymbol{B}} % left Cauchy-Green strain tensor
+\newcommand{\pref}{\boldsymbol{A}} % preferred direction
+\newcommand{\prefmat}{\boldsymbol{M}} % preferred direction matrix
+\newcommand{\PFpref}{\boldsymbol{a}} % push-forward of preferred direction
+\newcommand{\disp}{\boldsymbol{u}} % displacement
+\newcommand{\tdisp}{\boldsymbol{v}} % test displacement
+\newcommand{\hstress}{p} % hydrostatic stress
+\newcommand{\pinvar}{\imath^{}} % principal invariant
+\newcommand{\minvar}{\jmath^{}} % mixed invariant
+\newcommand{\iso}{\mathrm{iso}} % Isotropic
+\newcommand{\tiso}{\mathrm{aniso}} % Transversely isotropic
+
+
+\newcommand{\eq}{\,=\,}
+
+%Theorems, definitions, lemmas, remarks, etc. - Requires amsthm
+\newtheoremstyle{boldremark}
+    {\dimexpr\topsep/2\relax} % space above
+    {\dimexpr\topsep/2\relax} % space below
+    {}          % body font
+    {}          % indent amount
+    {\bfseries} % theorem head font
+    {.}         % punctuation after theorem head
+    {.5em}      % space after theorem head
+    {}          % theorem hed spec. (empty = "normal")
+\theoremstyle{definition}
+\newtheorem*{definition*}{Definition}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\numberwithin{theorem}{section}
+\newtheorem{lemma}{Lemma}
+\numberwithin{lemma}{section}
+\newtheorem{corollary}{Corollary}
+\numberwithin{corollary}{section}
+\theoremstyle{boldremark}
+\newtheorem{remark}{Remark}
+\numberwithin{remark}{section}
+
+
+\newcommand*\boxednum[1]{\!\scalebox{0.9}{
+  \tikz[baseline=(char.base)]{
+    \node[shape=rectangle,draw,inner sep=2pt](char){#1};}}\,}
+\makeatletter
+\newcommand{\dashto}[1][2pt]{
+  \settowidth{\@tempdima}{${}\rightarrow{}$}
+  \makebox[\@tempdima]{${}\rightarrow{}$}% typeset arrow
+  \makebox[-\@tempdima]{\hspace{-0.1\@tempdima}\color{white}\rule[0.5ex]{#1}{1pt}}% typeset overlay
+  \makebox[\@tempdima]{}% advance appropriate horizontal distance
+  }
+\makeatother
+\let\tilde\widetilde
+%\renewcommand\qedsymbol{$\blacksquare$}
+
+%\newcommand{\LRs}[1]{\left[ #1 \right]}
+%\newcommand{\jump}[1] {\ensuremath{\LRs{\![#1]\!}}}
+\newcommand{\jump}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\Vb}{%
+  \ooalign{\hidewidth $V$\hidewidth\cr\rule[.7ex]{1.6ex}{.3pt}}}
+
+%\DeclareRobustCommand{\frac}[3][0pt]{%
+%  \genfrac{}{}{}{}{\hspace{#1}#2\hspace{#1}}{\hspace{#1}#3\hspace{#1}}}
+\DeclareRobustCommand{\widefrac}[3][5pt]{%
+  \frac{\hspace{#1}#2\hspace{#1}}{\hspace{#1}#3\hspace{#1}}}
+  
+\newcommand{\upperone}[2]{\raisebox{-0.2\height}{$#1{}^1\!$}}
+\newcommand{\upone}{\mathpalette\upperone\relax}
+\newcommand{\lowertwo}[2]{\raisebox{-0.1\height}{$#1{}_{\!2}$}}
+\newcommand{\lowtwo}{\mathpalette\lowertwo\relax}
+\newcommand{\lowerthree}[2]{\raisebox{-0.1\height}{$#1{}_{\!3}$}}
+\newcommand{\lowthree}{\mathpalette\lowerthree\relax}
+\newcommand{\frachalf}[2]{\raisebox{0.0\height}{$#1{}\upone/\lowtwo$}}
+\newcommand{\onehalf}{\mathpalette\frachalf\relax}
+\newcommand{\fracthird}[2]{\raisebox{0.0\height}{$#1{}\upone/\lowthree$}}
+\newcommand{\onethird}{\mathpalette\fracthird\relax}
+%\newcommand{\frachalf}[2]{\scalebox{1.0}{$#1\frac{1}{2}$}}
+%\newcommand{\onehalf}{\mathpalette\frachalf\relax}
+
+\newcommand{\nl}{{\scriptscriptstyle \mathrm{nl.}}}
+\newcommand{\lin}{{\scriptscriptstyle \mathrm{lin.}}}
+\newcommand{\der}{{\scriptscriptstyle \mathrm{ind.}}}
+% \newcommand{\der}{{\scriptscriptstyle \mathrm{der.}}}
+\newcommand{\field}{{\scalebox{0.6}{$\mathrm{fld.}$}}}
+\newcommand{\interf}{{\scalebox{0.6}{$\mathrm{interf.}$}}}
+\newcommand{\bubb}{{\scalebox{0.6}{$\mathrm{bubb.}$}}}
+% \newcommand{\field}{{\scalebox{0.6}{$\mathrm{field}$}}}
+\newcommand{\DPG}{{\scalebox{0.5}{$\mathrm{DPG}$}}}
+\newcommand{\Poisson}{{\scalebox{0.5}{$\mathrm{Poiss.}$}}}
+\newcommand{\rank}{N}
+% \newcommand{\rank}{{\scalebox{0.5}{$\mathrm{rank}$}}}
+% \newcommand{\DPG}{{\scriptscriptstyle \mathrm{DPG}}}
+\newcommand{\infc}{\mathcal{I}} 
+\newcommand{\blparen}{\boldsymbol{(}}
+\newcommand{\brparen}{\boldsymbol{)}}
+
+\newcommand{\mcA}{\mathcal{A}}
+\newcommand{\mcB}{\mathcal{B}}
+\newcommand{\mcC}{\mathcal{C}}
+\newcommand{\mcD}{\mathcal{D}}
+\newcommand{\mcE}{\mathcal{E}}
+\newcommand{\mcF}{\mathcal{F}}
+\newcommand{\mcG}{\mathcal{G}}
+\newcommand{\mcH}{\mathcal{H}}
+\newcommand{\mcI}{\mathcal{I}}
+\newcommand{\mcJ}{\mathcal{J}}
+\newcommand{\mcK}{\mathcal{K}}
+\newcommand{\mcL}{\mathcal{L}}
+\newcommand{\mcM}{\mathcal{M}}
+\newcommand{\mcN}{\mathcal{N}}
+\newcommand{\mcO}{\mathcal{O}}
+\newcommand{\mcP}{\mathcal{P}}
+\newcommand{\mcQ}{\mathcal{Q}}
+\newcommand{\mcR}{\mathcal{R}}
+\newcommand{\mcS}{\mathcal{S}}
+\newcommand{\mcT}{\mathcal{T}}
+\newcommand{\mcU}{\mathcal{U}}
+\newcommand{\mcV}{\mathcal{V}}
+\newcommand{\mcW}{\mathcal{W}}
+\newcommand{\mcX}{\mathcal{X}}
+\newcommand{\mcY}{\mathcal{Y}}
+\newcommand{\mcZ}{\mathcal{Z}}
+
+
+\newcommand{\sfa}{\mathsf{a}}
+\newcommand{\sfb}{\mathsf{b}}
+\newcommand{\sfc}{\mathsf{c}}
+\newcommand{\sfd}{\mathsf{d}}
+\newcommand{\sfe}{\mathsf{e}}
+\newcommand{\sff}{\mathsf{f}}
+\newcommand{\sfg}{\mathsf{g}}
+\newcommand{\sfh}{\mathsf{h}}
+\newcommand{\sfi}{\mathsf{i}}
+\newcommand{\sfj}{\mathsf{j}}
+\newcommand{\sfk}{\mathsf{k}}
+\newcommand{\sfl}{\mathsf{l}}
+\newcommand{\sfm}{\mathsf{m}}
+\newcommand{\sfn}{\mathsf{n}}
+\newcommand{\sfo}{\mathsf{o}}
+\newcommand{\sfp}{\mathsf{p}}
+\newcommand{\sfq}{\mathsf{q}}
+\newcommand{\sfr}{\mathsf{r}}
+\newcommand{\sfs}{\mathsf{s}}
+\newcommand{\sft}{\mathsf{t}}
+\newcommand{\sfu}{\mathsf{u}}
+\newcommand{\sfv}{\mathsf{v}}
+\newcommand{\sfw}{\mathsf{w}}
+\newcommand{\sfx}{\mathsf{x}}
+\newcommand{\sfy}{\mathsf{y}}
+\newcommand{\sfz}{\mathsf{z}}
+\newcommand{\sfA}{\mathsf{A}}
+\newcommand{\sfB}{\mathsf{B}}
+\newcommand{\sfC}{\mathsf{C}}
+\newcommand{\sfD}{\mathsf{D}}
+\newcommand{\sfE}{\mathsf{E}}
+\newcommand{\sfF}{\mathsf{F}}
+\newcommand{\sfG}{\mathsf{G}}
+\newcommand{\sfH}{\mathsf{H}}
+\newcommand{\sfI}{\mathsf{I}}
+\newcommand{\sfJ}{\mathsf{J}}
+\newcommand{\sfK}{\mathsf{K}}
+\newcommand{\sfL}{\mathsf{L}}
+\newcommand{\sfM}{\mathsf{M}}
+\newcommand{\sfN}{\mathsf{N}}
+\newcommand{\sfO}{\mathsf{O}}
+\newcommand{\sfP}{\mathsf{P}}
+\newcommand{\sfQ}{\mathsf{Q}}
+\newcommand{\sfR}{\mathsf{R}}
+\newcommand{\sfS}{\mathsf{S}}
+\newcommand{\sfT}{\mathsf{T}}
+\newcommand{\sfU}{\mathsf{U}}
+\newcommand{\sfV}{\mathsf{V}}
+\newcommand{\sfW}{\mathsf{W}}
+\newcommand{\sfX}{\mathsf{X}}
+\newcommand{\sfY}{\mathsf{Y}}
+\newcommand{\sfZ}{\mathsf{Z}}
+\newcommand{\bsfe}{\bm{\mathsf{e}}}
+\newcommand{\bsfu}{\bm{\mathsf{u}}}
+\newcommand{\bsfr}{\bm{\mathsf{r}}}
+\newcommand{\bsfw}{\bm{\mathsf{w}}}
+
+
+\newcommand{\bsa}{\boldsymbol{a}}
+\newcommand{\bsb}{\boldsymbol{b}}
+\newcommand{\bsc}{\boldsymbol{c}}
+\newcommand{\bsd}{\boldsymbol{d}}
+\newcommand{\bse}{\boldsymbol{e}}
+\newcommand{\bsf}{\boldsymbol{f}}
+\newcommand{\bsg}{\boldsymbol{g}}
+\newcommand{\bsh}{\boldsymbol{h}}
+\newcommand{\bsi}{\boldsymbol{i}}
+\newcommand{\bsj}{\boldsymbol{j}}
+\newcommand{\bsk}{\boldsymbol{k}}
+\newcommand{\bsl}{\boldsymbol{l}}
+\newcommand{\bsm}{\boldsymbol{m}}
+\newcommand{\bsn}{\boldsymbol{n}}
+\newcommand{\bso}{\boldsymbol{o}}
+\newcommand{\bsp}{\boldsymbol{p}}
+\newcommand{\bsq}{\boldsymbol{q}}
+\newcommand{\bsr}{\boldsymbol{r}}
+\newcommand{\bss}{\boldsymbol{s}}
+\newcommand{\bst}{\boldsymbol{t}}
+\newcommand{\bsu}{\boldsymbol{u}}
+\newcommand{\bsv}{\boldsymbol{v}}
+\newcommand{\bsw}{\boldsymbol{w}}
+\newcommand{\bsx}{\boldsymbol{x}}
+\newcommand{\bsy}{\boldsymbol{y}}
+\newcommand{\bsz}{\boldsymbol{z}}
+\newcommand{\bsA}{\boldsymbol{A}}
+\newcommand{\bsB}{\boldsymbol{B}}
+\newcommand{\bsC}{\boldsymbol{C}}
+\newcommand{\bsD}{\boldsymbol{D}}
+\newcommand{\bsE}{\boldsymbol{E}}
+\newcommand{\bsF}{\boldsymbol{F}}
+\newcommand{\bsG}{\boldsymbol{G}}
+\newcommand{\bsH}{\boldsymbol{H}}
+\newcommand{\bsI}{\boldsymbol{I}}
+\newcommand{\bsJ}{\boldsymbol{J}}
+\newcommand{\bsK}{\boldsymbol{K}}
+\newcommand{\bsL}{\boldsymbol{L}}
+\newcommand{\bsM}{\boldsymbol{M}}
+\newcommand{\bsN}{\boldsymbol{N}}
+\newcommand{\bsO}{\boldsymbol{O}}
+\newcommand{\bsP}{\boldsymbol{P}}
+\newcommand{\bsQ}{\boldsymbol{Q}}
+\newcommand{\bsR}{\boldsymbol{R}}
+\newcommand{\bsS}{\boldsymbol{S}}
+\newcommand{\bsT}{\boldsymbol{T}}
+\newcommand{\bsU}{\boldsymbol{U}}
+\newcommand{\bsV}{\boldsymbol{V}}
+\newcommand{\bsW}{\boldsymbol{W}}
+\newcommand{\bsX}{\boldsymbol{X}}
+\newcommand{\bsY}{\boldsymbol{Y}}
+\newcommand{\bsZ}{\boldsymbol{Z}}
+
+
+
+\newcommand{\scA}{\mathscr{A}}
+\newcommand{\scB}{\mathscr{B}}
+\newcommand{\scC}{\mathscr{C}}
+\newcommand{\scD}{\mathscr{D}}
+\newcommand{\scE}{\mathscr{E}}
+\newcommand{\scF}{\mathscr{F}}
+\newcommand{\scG}{\mathscr{G}}
+\newcommand{\scH}{\mathscr{H}}
+\newcommand{\scI}{\mathscr{I}}
+\newcommand{\scJ}{\mathscr{J}}
+\newcommand{\scK}{\mathscr{K}}
+\newcommand{\scL}{\mathscr{L}}
+\newcommand{\scM}{\mathscr{M}}
+\newcommand{\scN}{\mathscr{N}}
+\newcommand{\scO}{\mathscr{O}}
+\newcommand{\scP}{\mathscr{P}}
+\newcommand{\scQ}{\mathscr{Q}}
+\newcommand{\scR}{\mathscr{R}}
+\newcommand{\scS}{\mathscr{S}}
+\newcommand{\scT}{\mathscr{T}}
+\newcommand{\scU}{\mathscr{U}}
+\newcommand{\scV}{\mathscr{V}}
+\newcommand{\scW}{\mathscr{W}}
+\newcommand{\scX}{\mathscr{X}}
+\newcommand{\scY}{\mathscr{Y}}
+\newcommand{\scZ}{\mathscr{Z}}
+
+
+\newcommand{\fka}{\mathfrak{a}}
+\newcommand{\fkb}{\mathfrak{b}}
+\newcommand{\fkc}{\mathfrak{c}}
+\newcommand{\fkd}{\mathfrak{d}}
+\newcommand{\fke}{\mathfrak{e}}
+\newcommand{\fkf}{\mathfrak{f}}
+\newcommand{\fkg}{\mathfrak{g}}
+\newcommand{\fkh}{\mathfrak{h}}
+\newcommand{\fki}{\mathfrak{i}}
+\newcommand{\fkj}{\mathfrak{j}}
+\newcommand{\fkk}{\mathfrak{k}}
+\newcommand{\fkl}{\mathfrak{l}}
+\newcommand{\fkm}{\mathfrak{m}}
+\newcommand{\fkn}{\mathfrak{n}}
+\newcommand{\fko}{\mathfrak{o}}
+\newcommand{\fkp}{\mathfrak{p}}
+\newcommand{\fkq}{\mathfrak{q}}
+\newcommand{\fkr}{\mathfrak{r}}
+\newcommand{\fks}{\mathfrak{s}}
+\newcommand{\fkt}{\mathfrak{t}}
+\newcommand{\fku}{\mathfrak{u}}
+\newcommand{\fkv}{\mathfrak{v}}
+\newcommand{\fkw}{\mathfrak{w}}
+\newcommand{\fkx}{\mathfrak{x}}
+\newcommand{\fky}{\mathfrak{y}}
+\newcommand{\fkz}{\mathfrak{z}}
+
+\newcommand{\fkA}{\mathfrak{A}}
+\newcommand{\fkB}{\mathfrak{B}}
+\newcommand{\fkC}{\mathfrak{C}}
+\newcommand{\fkD}{\mathfrak{D}}
+\newcommand{\fkE}{\mathfrak{E}}
+\newcommand{\fkF}{\mathfrak{F}}
+\newcommand{\fkG}{\mathfrak{G}}
+\newcommand{\fkH}{\mathfrak{H}}
+\newcommand{\fkI}{\mathfrak{I}}
+\newcommand{\fkJ}{\mathfrak{J}}
+\newcommand{\fkK}{\mathfrak{K}}
+\newcommand{\fkL}{\mathfrak{L}}
+\newcommand{\fkM}{\mathfrak{M}}
+\newcommand{\fkN}{\mathfrak{N}}
+\newcommand{\fkO}{\mathfrak{O}}
+\newcommand{\fkP}{\mathfrak{P}}
+\newcommand{\fkQ}{\mathfrak{Q}}
+\newcommand{\fkR}{\mathfrak{R}}
+\newcommand{\fkS}{\mathfrak{S}}
+\newcommand{\fkT}{\mathfrak{T}}
+\newcommand{\fkU}{\mathfrak{U}}
+\newcommand{\fkV}{\mathfrak{V}}
+\newcommand{\fkW}{\mathfrak{W}}
+\newcommand{\fkX}{\mathfrak{X}}
+\newcommand{\fkY}{\mathfrak{Y}}
+\newcommand{\fkZ}{\mathfrak{Z}}
+
+\newcommand{\rmE}{\mathrm{E}}
+\newcommand{\rmV}{\mathrm{V}}
+
+\newcommand{\pder}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\psder}[2]{\frac{\partial^2 #1}{\partial #2^2}}
+\newcommand{\psderm}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\tder}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\tsder}[2]{\frac{\mathrm{d}^2 #1}{\mathrm{d} #2^2}}
+\newcommand{\tnder}[3]{\frac{\mathrm{d}^#3 #1}{\mathrm{d} #2^#3}}
+
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+
+\newcommand{\smallo}[2]{\scalebox{0.63}{$#1\mathcal{O}$}}
+\newcommand{\mco}{{\mathpalette\smallo\relax}} %mathpalette calls mathchoice
+
+\newcommand{\hourg}[2]{\rotatebox{90}{\scalebox{0.7}{$#1\bowtie$}}}
+\newcommand{\hourglass}{{\mathpalette{\,\hourg}{\relax}}} %mathpalette calls mathchoice
+
+\newcommand\bovermat[2]{\makebox[0pt][l]{$\smash{\overbrace{\phantom{
+	\begin{matrix}#2\end{matrix}}}^{#1}}$}#2}
+
+\newcommand{\nml}{\hat{\mathbf{n}}}
+%\newcommand{\sfell}{\textsf{\fontfamily{Cabin-TLF}\selectfont l}}
+%\newcommand{\sfell}{\textsf{\fontfamily{fca}\selectfont l}}
+\newcommand{\sfell}{\textsf{\fontfamily{PTSans-TLF}\selectfont l}}
+% \newcommand{\sfellt}[2]{\raisebox{0.0\height}{$#1{}\text{\textsf{\fontfamily{PTSans-TLF}\selectfont l}}$}}
+% \newcommand{\sfell}{\mathpalette\sfellt\relax}
+\newcommand{\bsfellt}[2]{\raisebox{0.0\height}{$#1{}\text{\textsf{\fontfamily{PTSans-TLF}\selectfont \textbf{l}}}$}}
+\newcommand{\bsfell}{\mathpalette\bsfellt\relax}
+
+\newcommand{\nhe}{\tilde{n}}
+\newcommand{\Nhe}{\tilde{N}}
+\newcommand{\hatK}{\hat{\mcK}}
+\newcommand{\bfx}{\mathbf{x}}
+\newcommand{\bfe}{\mathbf{e}}
+\newcommand{\bsxi}{\boldsymbol{\xi}}
+\newcommand{\curlvts}{\nabla_{vts}\times}
+\newcommand{\curlstv}{\nabla_{stv}\times}
+\DeclareMathOperator*{\spacedim}{dim}
