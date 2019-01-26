@@ -36,40 +36,43 @@
 \DeclareMathSizes{10}{10}{6}{4}
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
-% \usepackage{etoolbox}
+\usepackage{etoolbox}
 
-% \makeatletter
-% % start with some helper code
-% % This is the vertical rule that is inserted
-% \newcommand*{\algrule}[1][\algorithmicindent]{%
-%   \makebox[#1][l]{%
-%     \hspace*{.2em}% <------------- This is where the rule starts from
-%     \vrule height .75\baselineskip depth .25\baselineskip
-%   }
-% }
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code to make vertical lines in the algorithmic environments
+\newcommand{\algruledefaultfactor}{.75}
+\newcommand{\algstrut}[1][\algruledefaultfactor]{\vrule width 0pt
+depth .25\baselineskip height #1\baselineskip\relax}
+\newcommand*{\algrule}[1][\algorithmicindent]{\hspace*{.5em}\vrule\algstrut
+\hspace*{\dimexpr#1-.5em}}
 
-% \newcount\ALG@printindent@tempcnta
-% \def\ALG@printindent{%
-%     \ifnum \theALG@nested>0% is there anything to print
-%     \ifx\ALG@text\ALG@x@notext% is this an end group without any text?
-%     % do nothing
-%     \else
-%     \unskip
-%     % draw a rule for each indent level
-%     \ALG@printindent@tempcnta=1
-%     \loop
-%     \algrule[\csname ALG@ind@\the\ALG@printindent@tempcnta\endcsname]%
-%     \advance \ALG@printindent@tempcnta 1
-%     \ifnum \ALG@printindent@tempcnta<\numexpr\theALG@nested+1\relax
-%     \repeat
-%     \fi
-%     \fi
-% }
-% % the following line injects our new indent handling code in place of the default spacing
-% \patchcmd{\ALG@doentity}{\noindent\hskip\ALG@tlm}{\ALG@printindent}{}{\errmessage{failed to patch}}
-% \patchcmd{\ALG@doentity}{\item[]\nointerlineskip}{}{}{} % no spurious vertical space
-% % end vertical rule patch for algorithmicx
+\makeatletter
+\newcount\ALG@printindent@tempcnta
+\def\ALG@printindent{%
+    \ifnum \theALG@nested>0% is there anything to print
+    \ifx\ALG@text\ALG@x@notext% is this an end group without any text?
+    % do nothing
+    \else
+    \unskip
+    % draw a rule for each indent level
+    \ALG@printindent@tempcnta=1
+    \loop
+    \algrule[\csname ALG@ind@\the\ALG@printindent@tempcnta\endcsname]%
+    \advance \ALG@printindent@tempcnta 1
+    \ifnum \ALG@printindent@tempcnta<\numexpr\theALG@nested+1\relax% can't do <=, so add one to RHS and use < instead
+    \repeat
+    \fi
+    \fi
+}%
 
+\patchcmd{\ALG@doentity}{\noindent\hskip\ALG@tlm}{\ALG@printindent}{}{\errmessage{failed to patch}}
+
+\AtBeginEnvironment{algorithmic}{\lineskip0pt}
+
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+\newcommand*\Stateh{\State \algstrut[1]}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Spacing. 10pt font has baselineskip=12pt, 11pt font has baselineskip=13.6pt, 12pt font has baselineskip=14.5pt
 \linespread{1.176} %Higher spacing =16pt if font is 11pt (because baselineskip is 13.6pt)

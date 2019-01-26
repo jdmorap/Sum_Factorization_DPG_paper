@@ -24,7 +24,7 @@ where $\tilde{b}(\cdot,\cdot)$ is a new bilinear functional acting on elements o
 \begin{equation}
 \left\{
 \begin{array}{lll}
-    (\psi,v)_{\scV^r(\mesh)}-b(u^h,v)-\tilde{b}(\tilde{u}^h,v)&=-\ell(v)&\forall v\in\scV^r(\mesh)\\
+    (\psi,v)_{\scV^r(\mesh)}{\color{red}+}b(u^h,v){\color{red}+} \tilde{b}(\tilde{u}^h,v)&={\color{red}\ell(v)}&\forall v\in\scV^r(\mesh)\\
     b(\delta u,\psi)&=0&\forall \delta u\in\scU^h\\
     \tilde{b}(\delta \tilde{u},\psi)&=0&\forall \delta \tilde{u}\in\scW^h(\partial\mesh),
 \end{array}\right.
@@ -44,7 +44,7 @@ Following this, we can arrive at the augmented linear system shown in the Introd
 \begin{equation}
 \left\{
 \begin{array}{ll}
-    \sfG\sfs-\sfB\sfu-\tilde{\mathsf{B}}\sfw&=-\sfell\\
+    \sfG\sfs{\color{red}+}\sfB\sfu{\color{red}+}\tilde{\mathsf{B}}\sfw&={\color{red}\sfell}\\
     \sfB^\T\sfs&=0\\
     \tilde{\mathsf{B}}^\T\sfs&=0,
 \end{array}\right.
@@ -78,7 +78,7 @@ An alternative way of solving the discrete DPG problem is to apply the so-called
 
 Even though there are not results for hexahedral elements, some stability analysis on triangles and tetrahedra have been made \cite{BrokenForms15,nagaraj2017construction}. Such studies showed that the higher the dimension of the enriched test space is with respect to the dimension of the trial spaces, the better is the possibility for the practical DPG method of having stability guaranteed. This implies that the Gram matrix in DPG is the largest array whose computation is required at every element of the partition, therefore a technique to accelerate its construction will favor the overall implementation of this finite element methodology. However, the fact of using a broken test space makes $\sfG$ block diagonal, with each block associated to one and only one element of the mesh. This means that $\sfG$ can be assembled and even ``inverted" element-wise, and this is per se a big computational relief. We encourage the reader to refer to another publication on the matter to know more about the specifics of the DPG family of methods \cite{demkowicz2015encyclopedia}.
 
-To show the effect in time savings that the proposed tensor-product-based integration generates, three different PDEs (along with its corresponding variational formulation) were picked and we compared the time needed to calculate the Gram matrix using conventional and sum factorization algorithms. Moreover we compared also the time elapsed for the formation of $\sfG$, $\sfB$ and $\sfell$ altogether. For all the examples below, the physical domain was equal to the master hexahedron, and a single-element mesh was considered. The last statement does not mean that these algorithms have not been tested with multiple elements or a more challenging physical geometry. In \cite{nagaraj2018} the ultraweak version of Maxwell's equations was implemented under adaptive refinements and a curvilinear geometry, in a nonlinear DPG framework. Due to the very costly computations at the local level, the sum factorization ideas derived above were incorporated into the code to allow for a finer mesh to be resolved in a reasonable time. With $p_0=5$, there was an observed speed-up of about 80 times in the computation of $\sfG$, $\sfB$ and $\sfell$ on every element. In the cases to be described next, similar speed-ups are obtained (at least for $\sfG$).
+To show the effect in time savings that the proposed tensor-product-based integration generates, three different PDEs (along with its corresponding variational formulation) were picked and we compared the time needed to calculate the Gram matrix using conventional and sum factorization algorithms. Moreover we compared also the time elapsed for the formation of $\sfG$, $\sfB$ and $\sfell$ altogether. For all the examples below, the physical domain was equal to the master hexahedron, and a single-element mesh was considered. The last statement does not mean that these algorithms have not been tested with multiple elements or a more challenging physical geometry. In \cite{nagaraj2018} the ultraweak version of Maxwell's equations was implemented under adaptive refinements and a curvilinear geometry, in the {\color{blue}modeling of fiber laser amplifiers}. Due to the very costly computations at the local level, the sum factorization ideas derived in this work were incorporated into the code to allow for a finer mesh to be resolved in a reasonable time. With $p_0=5$, there was an observed speed-up of about 80 times in the computation of $\sfG$, $\sfB$ and $\sfell$ on every element. In the cases to be described next, similar speed-ups are obtained (at least for $\sfG$).
 
 As a final but important remark, the matrices $\sfG$, $\sfB$ and $\sfell$ obtained in each of the examples below are equal (up to machine precision) independently of the algorithm used, which verifies the proper implementation of the different sum factorization algorithms. In order to make such a verification step, the resulting values from the conventional integration algorithm were used as the reference. In the following examples, the ordering of the loops within the algorithms that was preferred is the alternative one presented in Algorithm \ref{algo:l2tensor_alt}.
 
@@ -89,7 +89,8 @@ Poisson's equation is given by
 	-\div(k\nabla u)=r,
 	\label{poissonpde}
 \end{equation}
-\noindent where $k$ is a diffusivity coefficient, and $r$ is a source term. This PDE, in the context of DPG will lead to the broken primal variational formulation, in the terms of (\ref{brokenvar}),
+% 
+where $k$ is a diffusivity coefficient, and $r$ is a source term. This PDE, in the context of DPG will lead to the broken primal variational formulation, in the terms of (\ref{brokenvar}),
 % 
 \begin{equation}
 \begin{aligned}
@@ -105,7 +106,7 @@ Poisson's equation is given by
 % 
 where $(\cdot,\cdot)_\mesh=\sum_{\mcK\in\mesh}(\cdot,\cdot)_{\mcK}$,  $\langle\cdot,\cdot\rangle_{\partial\mesh}$ is a duality pairing between $\HSo^{-\onehalf}(\partial\mesh)$ and $\HSo^{\onehalf}(\partial\mesh)$. Recalling the Piola maps defined above, the main discrete element subspaces are $\scU^h=W^{p_0}=T^{\grad}\mcQ^{p_0,p_0,p_0}(\mcI^3)$ and $\scV^r=W^{p_r}=T^{\grad}\mcQ^{p_r,p_r,p_r}(\mcI^3)$, where $p_r=p_0+\Delta p$. In order to compute the enriched stiffness matrix, and the enriched load vector a new portion of code must be added to algorithms \ref{algo:h1conven} and \ref{algo:h1tensor}. The procedure carried out to compute these additional arrays so far is not optimal, so in a later work the performance of this task can be improved. Moreover, the computation of $\tilde{\mathsf{B}}$ is done in the conventional way at all times, hence we leave it out of the computing time measurements.
 
-Table \ref{tab:results_poisson1} shows the average wall clock time of 50 runs of computing the $H^1$ Gram matrix for this problem, for different values of $p_r$. This plot is made with $p_r+1$ as the abscissae because this is the parameter with respect to which the computational cost estimates were presented. The expected trend lines accompany the three data plots in Figure \ref{tab:results_poisson1}.
+Table \ref{tab:results_poisson1} shows the average wall clock time of 50 runs of computing the $H^1$ Gram matrix for this problem, for different values of $p_r$. This plot is made with $p_r+1$ as the abscissae because this is the parameter with respect to which the computational cost estimates were presented. The expected trend lines accompany the two data plots in Figure \ref{fig:results_poisson1} as a reference to compare with. It is noticeable that in the conventional case this trend fits better to the data than in the new algorithm.
 %
 \begin{table}[ht]
     \centering
@@ -128,12 +129,13 @@ Table \ref{tab:results_poisson1} shows the average wall clock time of 50 runs of
 %
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=12cm]{poisson_G.eps}
+    \includegraphics[width=11cm]{poisson_G.eps}
     \caption{Average computation time (seconds) of $\sfG^{\grad}$ in the Primal Poisson DPG implementation, for different polynomial orders and two integration algorithms with respect to $p_r+1$}
     \label{fig:results_poisson1}
 \end{figure}
 
-Additionally, Table\ref{tab:results_poisson2} and Figure \ref{fig:results_poisson2} show the average time for computing $\sfG$, $\sfB$ and $\sfell$ within the \textit{elem} subroutine, having fixed $\Delta p=2$. Since $\sfB$ and $\sfell$ are constructed using a conventional integration approach, this result intends to inform a closer estimate of the actual time savings when using sum factorization in a DPG computational solution. Here, it is more useful to see how expensive the process is for a given trial space order, then we plot with respect to $p_0$.
+Additionally, Table \ref{tab:results_poisson2} and Figure \ref{fig:results_poisson2} show the average time for computing $\sfG$, $\sfB$ and $\sfell$ within the code's element subroutine (the component of the finite element code that constructs the element matrices), having fixed $\Delta p=2$. Since $\sfB$ and $\sfell$ are constructed using a conventional integration approach, this result intends to inform a closer estimate of the actual time savings when using sum factorization in a DPG computational solution. Notice that the reference line on this plot indicates that, in both cases, the trend is again approximately of ninth order.
+% Here, it is more useful to see how expensive the process is for a given trial space order, then we plot with respect to $p_0$.
 %
 \begin{table}[ht]
     \centering
@@ -154,8 +156,8 @@ Additionally, Table\ref{tab:results_poisson2} and Figure \ref{fig:results_poisso
 %
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=10cm]{poisson_all.eps}
-    \caption{Average computation time (seconds) of $\sfG^{\grad}$, $\mathsf{B}$, $\sfell$, in the Primal Poisson DPG implementation, for different polynomial orders and two integration algorithms with respect to $p_0$, with fixed $\Delta p=2$}
+    \includegraphics[width=11cm]{poisson_all.eps}
+    \caption{Average computation time (seconds) of $\sfG^{\grad}$, $\mathsf{B}$, $\sfell$, in the Primal Poisson DPG implementation, for different polynomial orders and two integration algorithms with respect to $p_r+1$, with fixed $\Delta p=2$}
     \label{fig:results_poisson2}
 \end{figure}
 % 
@@ -165,11 +167,12 @@ Additionally, Table\ref{tab:results_poisson2} and Figure \ref{fig:results_poisso
 A second illustrative problem is the time-harmonic Maxwell's wave equation,
 %
 \begin{equation}
-\curl \mu^{-1}\curl E - \omega^2\epsilon E=\zI\omega J,
+\curl{\color{red}{\left( \mu^{-1}\curl E \right)}} - \omega^2\epsilon E=\zI\omega J,
 \label{maxwellpde}
 \end{equation}
 % 
-where $E$ is the unknown electric field, $J$ is the imposed electric current, $\omega$ is the frequency, and $\mu,\epsilon$ are electromagnetic properties. In terms of the abstract formulation (\ref{brokenvar}), the primal version of the broken variational form for (\ref{maxwellpde}) is
+where $E$ is the unknown electric field, $J$ is the imposed electric current, $\omega$ is the {\color{blue} angular frequency, and $\mu$ and $\epsilon$ are electromagnetic constants (the permeability and the permittivity, respectively)}. In terms of the abstract formulation (\ref{brokenvar}), the primal version of the broken variational form for (\ref{maxwellpde}) is
+
 \begin{equation}
 \begin{aligned}
     \scU&=\HSo(\curl,\Omega),\\
@@ -208,7 +211,7 @@ Similarly to the previous case, we present results for the construction of the G
 %
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=12cm]{maxwell_G.eps}
+    \includegraphics[width=11cm]{maxwell_G.eps}
     \caption{Average computation time (seconds) of $\sfG^{\curl}$ in the Primal Maxwell DPG implementation, for different polynomial orders and two integration algorithms with respect to $p_r+1$}
     \label{fig:results_maxwell1}
 \end{figure}
@@ -232,8 +235,8 @@ Similarly to the previous case, we present results for the construction of the G
 %
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=10cm]{maxwell_all.eps}
-    \caption{Average computation time (seconds) of $\sfG^{\curl}$, $\mathsf{B}$, $\sfell$, in the Primal Maxwell DPG implementation, for different polynomial orders and two integration algorithms with respect to $p_0$, with fixed $\Delta p=2$}
+    \includegraphics[width=11cm]{maxwell_all.eps}
+    \caption{Average computation time (seconds) of $\sfG^{\curl}$, $\mathsf{B}$, $\sfell$, in the Primal Maxwell DPG implementation, for different polynomial orders and two integration algorithms with respect to $p_r+1$, with fixed $\Delta p=2$}
     \label{fig:results_maxwell2}
 \end{figure}
 
@@ -245,7 +248,7 @@ The time-harmonic acoustics system of equations reads as follows:
     \left\{
     \begin{array}{ll}
         \zI\omega u + \nabla p &=0, \\
-        \zI\omega p + \div p &=f,
+        \zI\omega p + \div u &=f,
     \end{array}
     \right.
 \end{equation}
@@ -306,9 +309,9 @@ In (\ref{acoustics_adjoint_norm}), $\alpha$ is some positive real number that is
 \label{adjoint_norm_terms}
 \end{equation}
 %
-after implementing the respective Piola maps. Finally, besides using Algorithms \ref{algo:h1tensor} and \ref{algo:hdivtensor} for the four associated terms in (\ref{acoustics_adjoint_norm}), an analogous tensorization-based algorithm must be built for the two integrals in (\ref{adjoint_norm_terms}).
+after implementing the respective Piola maps. Finally, besides using Algorithms \ref{algo:h1tensor} and \ref{algo:hdivtensor} for the four associated terms in (\ref{acoustics_adjoint_norm}), an analogous sum factorization algorithm must be built for the two integrals in (\ref{adjoint_norm_terms}).
 
-This problem was solved using both conventional integration and tensorization-based integration, translating the new ideas for the stiffness matrix, the load vector and the Gram matrix produced by the adjoint graph norm, into the code. Table \ref{tab:results_acoustics} and Figure \ref{fig:results_acoustics} show the results of the average computing time (of 20 runs) of $\sfG$, $\sfB$, and $\sfell$, for several polynomial degrees.
+This problem was solved using both conventional integration and tensor-product based integration, translating the ideas above for the stiffness matrix, the load vector and the Gram matrix produced by the adjoint graph norm, into the code. Table \ref{tab:results_acoustics} and Figure \ref{fig:results_acoustics} show the results of the average computing time (of 20 runs) of $\sfG$, $\sfB$, and $\sfell$, for several polynomial degrees. Here, because of the different trends observed, two reference lines are presented, one of ninth order and one of seventh order.
 %
 \begin{table}[ht]
     \centering
@@ -331,19 +334,24 @@ This problem was solved using both conventional integration and tensorization-ba
 %
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=12cm]{acoustics.eps}
-    \caption{Average computation time (seconds) of $\sfG$, $\mathsf{B}$, $\sfell$, in the ultraweak acoustics DPG implementation, for different polynomial orders and two integration algorithms, with fixed $\Delta p=2$}
+    \includegraphics[width=11cm]{acoustics.eps}
+    \caption{Average computation time (seconds) of $\sfG$, $\mathsf{B}$, $\sfell$, in the ultraweak acoustics DPG implementation, for different polynomial orders and two integration algorithms with respect to $p_r+1$, with fixed $\Delta p=2$}
     \label{fig:results_acoustics}
 \end{figure}
 
 \subsection{Discussion}
 
-The results observed above allow to identify several achievements, while also make clear what aspects need improvement. 
+The results observed above allow to identify several achievements, while also make clear what aspects need improvement. Notice that all five plots have the same scales in their axes in order to facilitate visual comparison.
 
-Firstly, Figures \ref{fig:results_poisson1} and \ref{fig:results_maxwell1} communicate well that the expected asymptotic reference lines approach the numerical experiments results as $p_r$ increases. This is more noticeable in the case of Poisson, in which, because of dealing with a $H^1$-only Gram matrix and a smaller set of auxiliary functions is required (in algorithm \ref{algo:h1tensor}), then the final accumulation statement quickly begins to dominate the computational complexity as the polynomial order rises. On the other hand, the case of Maxwell's equation required the use of algorithm \ref{algo:hcurltensor}, which has intermediate accumulation statements that are comparable in cost to the final one when $p_r$ is not very high. However, on Figure \ref{fig:results_maxwell1} the last three values of polynomial order indicate that the computing time clearly develops at a slower rate than in the conventional case, which indeed looks quite close to the trend line $~(p_r+1)^9$.
+Firstly, Figures \ref{fig:results_poisson1} and \ref{fig:results_maxwell1} communicate well that the expected asymptotic reference lines approach the numerical experiments results as $p_r$ increases. Unlike the dashed reference line (corresponding to $(p_r+1)^9$), which is almost parallel to the plot for conventional integration, the fine dotted line (corresponding to $(p_r+1)^7$) seems to grow slightly faster than the data for the sum factorization results. It may be expected that at higher polynomial degrees the rate becomes closer to 7, but at the moment the important outcome is that the integration of $\sfG$ indeed became two orders of magnitude faster.
 
-As a second observation, we see that Figures \ref{fig:results_poisson2} and \ref{fig:results_maxwell2} reveal that, when looking at the elapsed time of computing all the matrices, the sum factorization approach overcomes the performance of the conventional algorithm at all degrees $p_0$. Such a result is also visible in Tables \ref{tab:results_poisson2} and \ref{tab:results_maxwell2}, in which the difference between columns 4 and 5 correspond to the actual time saving when going from the conventional integration scheme to the herein introduced algorithm, for every time the \textit{elem} subroutine is invoked in a DPG code. For the highest values of $p_0$, this saving can be of the order of a second per element in Poisson, or 9 seconds in Maxwell, therefore leading to a big reduction of computation time when a refined mesh is in use.
+% This is more noticeable in the case of Poisson, in which, because of dealing with a $H^1$-only Gram matrix and a smaller set of auxiliary functions is required (in algorithm \ref{algo:h1tensor}), then the final accumulation statement quickly begins to dominate the computational complexity as the polynomial order rises. On the other hand, the case of Maxwell's equation required the use of algorithm \ref{algo:hcurltensor}, which has intermediate accumulation statements that are comparable in cost to the final one when $p_r$ is not very high. However, on Figure \ref{fig:results_maxwell1} the last three values of polynomial order indicate that the computing time clearly develops at a slower rate than in the conventional case, which indeed looks quite close to the trend line $~(p_r+1)^9$.
 
-The advantages of using sum factorization for numerical integration has, nonetheless, the requirement of finding a procedure of computing $\sfB$ and $\sfell$ that can take more profit of the nesting of integrals developed above for so diverse situations. Clearly, for the ultraweak formulation that was studied, there was a way to extend the ideas of sum-factorization and take advantage of them, as noticed in Figure \ref{fig:results_acoustics}, where it can be seen that the complexity rates were successfully taken to the desired order. However, for the first two problems, the effect of not having available a more efficient algorithm for these matrices can be appreciated in the last points of Figures \ref{fig:results_poisson2} and \ref{fig:results_maxwell2}, where, despite relatively big savings in the overall computing time of the matrices under study, it is clear that the rate of the tensor-product-based algorithm is similar to that of the conventional algorithm. This happens because computing the stiffness matrix $\sfB$ in this way has a computational complexity leading term of $\mcO((p_0+1)^9)$, which will obviously begin dominating the cost of all the integration as $p_0$ grows.
+As a second observation, we see that Figures \ref{fig:results_poisson2} and \ref{fig:results_maxwell2} reveal that, when looking at the elapsed time of computing all the matrices, the sum factorization approach overcomes the performance of the conventional algorithm at all degrees $p_r$. Such a result is also visible in Tables \ref{tab:results_poisson2} and \ref{tab:results_maxwell2}, in which the difference between columns 4 and 5 correspond to the actual time saving when going from the conventional integration scheme to the herein introduced algorithm, for every time the element subroutine is invoked in a DPG code. For the highest values of $p_r$, this saving can be of the order of a second per element in Poisson, or 9 seconds in Maxwell, therefore leading to a big reduction of computation time when a refined mesh is in use. It can be seen nevertheless that the complexity rate for the compute time of all the matrices, in both types of integration, is still 9. This happens because computing the stiffness matrix $\sfB$ with the conventional algorithm has a leading term of $\mcO((p_0+1)^9)$ in its computational complexity, which will obviously begin dominating the cost of all the integration as $p_0$ grows.
 
-As a closing remark, we can state that having proposed and utilized a tensor-product-based algorithm for the integration of less usual Gram matrices, like that of $H(\curl)$ or the adjoint-graph inner product for $H^1\times H(\div)$, proved to be very useful regarding the enormous time saving: about 7 seconds saved per element when $p_0=5$ and $\Delta p=2$, in Maxwell's primal form (16 times faster); or 21 seconds saved in the ultraweak formulation for acoustics with $p_0=6$ and $\Delta p=2$ (44 times faster); hence this kind of benefit is expected to extend to the rest of energy spaces and inner products frequently used in DPG and other FE methods.
+Earning all the advantages of sum factorization for numerical integration has therefore the requirement of finding a good procedure for the construction of $\sfB$ and $\sfell$. Such a procedure must be able to take profit of the nesting of integrals, as developed above for so diverse situations, for multiple variational formulations. 
+
+For the ultraweak formulation, that was clearly observed. In that case, there was a way to extend the ideas of sum factorization and take advantage of them, as noticed in Figure \ref{fig:results_acoustics}. There, it can be seen that the complexity rates were successfully taken to the desired order.
+% However, for the first two problems, the effect of not having available a more efficient algorithm for these matrices can be appreciated in the last points of Figures \ref{fig:results_poisson2} and \ref{fig:results_maxwell2}, where, despite relatively big savings in the overall computing time of the matrices under study, it is clear that the rate of the tensor-product-based algorithm is similar to that of the conventional algorithm. This happens because computing the stiffness matrix $\sfB$ in this way has a computational complexity leading term of $\mcO((p_0+1)^9)$, which will obviously begin dominating the cost of all the integration as $p_0$ grows.
+
+As a closing remark, we can state that having proposed and utilized a tensor-product-based algorithm for the integration of less usual Gram matrices, like that of $H(\curl)$ or the adjoint-graph inner product for $H^1\times H(\div)$, proved to be very useful regarding the really meaningful relative savings: 16 times faster when $p_0=5$ and $\Delta p=2$, in Maxwell's primal form; or 44 times faster in the ultraweak formulation for acoustics with $p_0=6$ and $\Delta p=2$. This kind of benefit is thereby expected to extend to the rest of energy spaces and inner products frequently used in DPG and other FE methods.

@@ -33,7 +33,7 @@ The three-dimensional exact sequence involves all three classical vector calculu
 
 We are interested in tensor-product three-dimensional finite elements equipped with discrete subspaces of each of the exact sequence spaces \eqref{3dexactseq}. The most relevant example is the hexahedron, since it is a triple tensor product of the 1D simplex, the interval.
 
-\subsection{Tensor-product finite element shape functions}
+\subsection{Tensor-product finite element shape functions}\label{subsec:tensor_fe}
 
 Let $\mcI=(0,1)$ be the master interval in $\R$ and denote the master hexahedron by $\hatK:=\mcI^3$ (in what follows, $\hatK$ and $\mcI^3$ will be used interchangeably). Let $\bfx_\mcK:\hatK\longrightarrow\mcK$ be the element map, transforming the master element into a physical space element $\mcK$. Suppose $\bfx_\mcK$ is a diffeomorphism over $\hatK$. Then the Jacobian matrix $\mcJ$ is well defined,
 % 
@@ -43,7 +43,7 @@ Let $\mcI=(0,1)$ be the master interval in $\R$ and denote the master hexahedron
 
 \noindent where $\bsxi$ is the position vector in the parametric (master) domain. The determinant of the Jacobian will be denoted $|\mcJ|:=\det\mcJ$.\\
 
-Let $T^{\grad}:\HSo^1(\hatK)\longrightarrow\HSo^1(\mcK)$ be the map that takes the $\HSo^1$ finite element space defined on the master domain $\hatK$ to the physical space element $\mcK$. In the same fashion consider analogue maps denoted $T^{\curl}$, $T^{\div}$, $T$; these are the pullback or Piola maps for each function space in (\ref{3dexactseq}), and they are defined as follows:
+Let $T^{\grad}:\HSo^1(\hatK)\longrightarrow\HSo^1(\mcK)$ be the map that takes the $\HSo^1$ finite element space defined on the master domain $\hatK$ to the physical space element $\mcK$. In the same fashion consider analogue maps denoted $T^{\curl}$, $T^{\div}$, $T$; these are the pullback or Piola maps for each function space in (\ref{3dexactseq}), and they are defined as follows {\color{blue}(see \cite[\S 2.1.5]{hpbook2})}:
 % 
 \begin{align}
     \HSo^1(\hatK)\ni \hat{u} \longmapsto T^{\grad}\hat{u}&:=\hat{u}\circ\bfx_\mcK^{-1}=u\in\HSo^1(\mcK)\label{piolah1} \\
@@ -54,7 +54,10 @@ Let $T^{\grad}:\HSo^1(\hatK)\longrightarrow\HSo^1(\mcK)$ be the map that takes t
 
 As an important remark concerning notation, we have opted to use a circumflex or ``hat" ( $\hat{}$ ) above nearly every function, domain or vector space defined in the master space.
 
-Now, it is known that for a FE method implementation, we don't work with the entire energy space but with a finite-dimensional linear subspace, usually consisting of polynomials. Following the notation in \cite{hpbook2,Fuentes2015}, let us call such subspaces as follows:
+Now, it is known that for a FE method implementation, we don't work with the entire energy space but with a finite-dimensional linear subspace, usually consisting of polynomials. 
+{\color{blue} When we work on a \emph{mesh} of multiple elements, there exist different conditions for a finite-dimensional piecewise polynomial subspace to be \emph{conforming} to (i.e., to be a proper subspace of) each energy space. For the case of $H^1$, the piecewise polynomial functions must be scalar-valued and globally continuous. In $H(\curl)$, we must construct vector-valued piecewise polynomials satisfying tangential continuity across elements. $H(\div)$-conformity requires continuity of the normal component of the vector-valued piecewise polynomial functions. Finally, $L^2$-conformity requires no kind of inter-element continuity for its scalar-valued functions. However, in this work we focus on the computations on a single element, then inter-element continuity is not a concern in our derivations. However, it is valuable to be aware of this fact when choosing the finite element spaces and basis functions.}
+
+Following the notation in \cite{hpbook2,Fuentes2015}, let us call the finite-dimensional subspaces for $\hatK$ as follows:
 % 
 \begin{align*}
     \hat{W}^p\subsetneq&\HSo^1(\hatK) \\
@@ -84,7 +87,7 @@ Due to the element map being a diffeomorphism, there is a unique correspondence 
     \forall q\in Y^p\ &\exists !\ \hat{q}\in\hat{Y}^p\text{ such that }q=T\hat{q}.
 \end{align}
 
-Those finite-dimensional subspaces for the hexahedron are \cite{Nedelec80}:
+Those finite-dimensional subspaces for the hexahedron are \cite{hpbook2,Nedelec80}:
 % 
 \begin{align*}
     \hat{W}^p&=\mcQ^{p_1,p_2,p_3}(\mcI^3)\\
@@ -96,12 +99,18 @@ Those finite-dimensional subspaces for the hexahedron are \cite{Nedelec80}:
     \hat{Y}^p&=\mcQ^{p_1-1,p_2-1,p_3-1}(\mcI^3)
 \end{align*}
 
-\noindent where $p_1,p_2,p_3$ are positive integers and for any non-negative integers $p,q,r$ the space $\mcQ^{p,q,r}(\mcI^3):=\mcP^p(\mcI)\otimes\mcP^q(\mcI)\otimes\mcP^r(\mcI)$, with $\mcP^p(\mcI)$ being the space of univariate polynomials defined over $\mcI$ of degree less than or equal to $p$. A space like $\mcQ^{p,q,r}(\mcI^3)$ is known as a tensor product polynomial space, and an element of such a type of space is next characterized:
-% 
+\noindent where $p_1,p_2,p_3$ are positive integers and for any non-negative integers $p,q,r$ the space $\mcQ^{p,q,r}(\mcI^3):=\mcP^p(\mcI)\otimes\mcP^q(\mcI)\otimes\mcP^r(\mcI)$, with $\mcP^p(\mcI)$ being the space of univariate polynomials defined over $\mcI$ of degree less than or equal to $p$. A space like $\mcQ^{p,q,r}(\mcI^3)$ is known as a tensor product polynomial space. 
+{\color{blue}If $\{f_i^p;\ i=0,...,p\}$, $\{f_j^q;\ j=0,...,q\}$, $\{f_k^r;\ k=0,...,r\}$ are bases for the polynomial spaces $\mcP^p(\mcI),\mcP^q(\mcI),\mcP^r(\mcI)$, respectively, then $\{f_{ijk}^{p,q,r};\ i=0,...,p;\ j=0,...,q;\ k=0,...,r\}$ is a basis for $\mcQ^{p,q,r}(\mcI^3)$, where these functions are defined by
 \begin{equation}
-    f\in\mcQ^{p,q,r}(\mcI^3)\iff\exists ! f_1\in\mcP^p(\mcI),f_2\in\mcP^q(\mcI),f_3\in\mcP^r(\mcI)\text{ such that }
-    f(\bsxi)=f_1(\xi_1)f_2(\xi_2)f_3(\xi_3)\ \forall\bsxi\in\mcI^3.
-\end{equation}
+    f_{ijk}^{p,q,r}(\bsxi)=f_i^p(\xi_1)f_j^q(\xi_2)f_k^r(\xi_3)\ \forall\bsxi\in\mcI^3;\ i=0,...,p;\ j=0,...,q;\ k=0,...,r.
+\end{equation} }
+
+% and an element of such a type of space is next characterized:
+% % 
+% \begin{equation}
+%     f\in\mcQ^{p,q,r}(\mcI^3)\iff\exists ! f_1\in\mcP^p(\mcI),f_2\in\mcP^q(\mcI),f_3\in\mcP^r(\mcI)\text{ such that }
+%     f(\bsxi)=f_1(\xi_1)f_2(\xi_2)f_3(\xi_3)\ \forall\bsxi\in\mcI^3.
+% \end{equation}
 
 Corresponding polynomial subspaces are also defined for the one-dimensional interval's exact sequence. They are:
 % 
@@ -141,6 +150,13 @@ Finally, the Gram matrix that is going to be studied throughout this work is exp
 Our goal is to propose algorithms to compute a Gram matrix (\ref{generalgram}) more efficiently than the conventional ones when dealing with tensor-product finite-element spaces of shape functions. All the energy spaces in the 3D exact sequence (\ref{3dexactseq}) are going to be analyzed (setting $\Omega=\mcK$), thereby a particular inner product is required to be defined in every case. The finite-dimensional Hilbert spaces will be those defined in (\ref{finitedimspaces}).
 
 The following subsections are presented in order of complexity instead of their position in the exact sequence. We remark that, although the first two cases to be described may be well-known (i.e. $L^2$ and $H^1$) they introduce notions that are fundamental to familiarize with the procedure and so derive the other two cases ($H(\div)$ and $H(\curl)$ spaces (harder to find in the literature) in a systematic manner, which is possibly the main contribution of this work.
+
+{\color{red}\begin{remark}
+    Even though the concept of exact sequence of finite element spaces has implications in approximability, we do not deal with that theory here. Instead, our main reason to invoke it is mostly to show that we are including in this work all four possible energy spaces. Other families of $H^1$, $H(\curl)$, $H(\div)$, and $L^2$ finite element subspaces that do not form exact sequences, but that are tensor-product derived and for which Piola mappings \eqref{piolah1}-\eqref{piolal2} are valid, are suitable too for the fast integration algorithms presented below. In particular, if those spaces form a complex (as defined in 2.1, i.e., if  $\sfR(A_i)\subset\sfN(A_{i+1})$ for all $i$), the results must hold despite the non-exactness. However, we advise a careful implementation when trying the algorithms in such a scenario, as well as checking that our derivations remain valid for the spaces at hand.
+\end{remark}}
+{\color{blue}\begin{remark}
+    The following sections comprise an intensive notation dealing with indices, which produce long and complicated expressions. To avoid further complexity and any possible confusion, no summation convention is used anywhere in this paper.
+\end{remark}}
 
 \subsection{Space \texorpdfstring{$L^2$}{L2}}
 
@@ -209,7 +225,7 @@ The second line above depicts how the original volume integral turns into three 
 \begin{align}
         \mcG_{i_3j_3}^A(\xi_1,\xi_2):=&\int\limits_0^1 \nu_{i_3}(\xi_3)\nu_{j_3}(\xi_3)|\mcJ(\xi_1,\xi_2,\xi_3)|^{-1}d\xi_3  \label{GA_l2}  \\
         \mcG_{i_2j_2i_3j_3}^B(\xi_1):=&\int\limits_0^1 \nu_{i_2}(\xi_2)\nu_{j_2}(\xi_2)\mcG_{i_3j_3}^A(\xi_1,\xi_2)d\xi_2 \label{GB_l2} \\        
-        \Rightarrow \sfG_{IJ}=\mcG_{i_1ij_1i_2j_2i_3j_3}:=& \int\limits_0^1 \nu_{i_1}(\xi_1)\nu_{j_1}(\xi_1)\mcG_{i_2j_2i_3j_3}^B(\xi_1)d\xi_1    \label{ip_l2_GAB}
+        \Rightarrow \sfG_{IJ}=\mcG_{i_1j_1i_2j_2i_3j_3}:=& \int\limits_0^1 \nu_{i_1}(\xi_1)\nu_{j_1}(\xi_1)\mcG_{i_2j_2i_3j_3}^B(\xi_1)d\xi_1    \label{ip_l2_GAB}
 \end{align}
 
 Given $\xi_1,\xi_2$ we can evaluate $\mcG_{i_3j_3}^A$ with numerical integration. Let $\xi_3^n$, $n=1,...,N$ be the collection of quadrature points in the interval (0,1) that make a polynomial integrand of degree $2N-1$ be numerically integrated with full accuracy, and $w_3^N$ be the associated weight. Then the value of (\ref{GA_l2}) may be approximated by:
@@ -222,8 +238,8 @@ Given $\xi_1,\xi_2$ we can evaluate $\mcG_{i_3j_3}^A$ with numerical integration
 In the same manner, let $\xi_2^m,w_2^m$, with $m=1,...,M$ and $\xi^l_1,w_1^l$, with $l=1,...,L$. We can approximate thus expressions (\ref{GB_l2}) and (\ref{ip_l2_GAB}) as follows:
 % 
 \begin{align}
-    \mcG_{i_1j_2i_3j_3}^B(\xi_1)\approx& \sum\limits_{m=1}^M\nu_{i_2}(\xi_2^m)\nu_{j_2}(\xi_2^m)\mcG_{i_3j_3}^A(\xi_1,\xi_2^m)w_2^m, \label{GB_l2_quad}\\
-    \mcG_{i_1ij_1i_2j_2i_3j_3}\approx&
+    \mcG_{i_2j_2i_3j_3}^B(\xi_1)\approx& \sum\limits_{m=1}^M\nu_{i_2}(\xi_2^m)\nu_{j_2}(\xi_2^m)\mcG_{i_3j_3}^A(\xi_1,\xi_2^m)w_2^m, \label{GB_l2_quad}\\
+    \mcG_{i_1j_1i_2j_2i_3j_3}\approx&
     \sum\limits_{l=1}^L\nu_{i_1}(\xi_1^l)\nu_{j_1}(\xi_1^l)\mcG_{i_2j_2i_3j_3}^B(\xi_1^l)w_1^l .\label{ip_l2tensor}    
 \end{align}
 
@@ -236,19 +252,19 @@ Suppose we want to approximate the triple integral in the last line of (\ref{l2i
     \label{ip_l2conven}
 \end{equation}
 
-Clearly, (\ref{ip_l2conven}) and (\ref{GA_l2_quad})-(\ref{ip_l2tensor}) are equivalent if we use the same quadrature order per coordinate. However, here lies the entire spirit of the sum-factorization or tensor-product-based integration, as we will see. Firstly, it is a direct observation that the algorithm to compute (\ref{ip_l2conven}) is the conventional one in 3D finite element codes, which is presented in Algorithm \ref{algo:l2conven}. Here, as usual in FE algorithms, the symmetry $\sfG_{IJ}=\sfG_{JI}$ is taken advantage of, so that the off-diagonal entries are computed only once.
+Clearly, (\ref{ip_l2conven}) and (\ref{GA_l2_quad})-(\ref{ip_l2tensor}) are equivalent if we use the same quadrature order per coordinate. However, here lies the entire spirit of the sum-factorization or tensor-product-based integration, as we will see. Firstly, it is a direct observation that the algorithm to compute (\ref{ip_l2conven}) is the conventional one in 3D finite element codes, which is presented in Algorithm \ref{algo:l2conven}. Here, as usual in FE algorithms, the symmetry $\sfG_{IJ}=\sfG_{JI}$ is taken advantage of, so that the off-diagonal entries are computed only once. {\color{blue}Please note that whenever a subroutine \textbf{call} is made in any of the algorithms below, the first arguments given are inputs, with a semicolon separating them from the outputs. Moreover, outputs written within curly brackets denote arrays.}
 % 
 \begin{algorithm}[ht]
 \caption{Conventional computation of the $L^2$ Gram Matrix}\label{algo:l2conven}
 \begin{algorithmic}
 \Procedure{L2Gram}{$i_{el},\sfG$}\Comment{Compute matrix $\sfG$ for element No. $i_{el}$ - Conventional algorithm}
-\State\textbf{call }setquadrature3D($i_{el},p_1,p_2,p_3,L,\bsxi_{lmn},w_{lmn}$)
+\State\textbf{call }setquadrature3D($i_{el},p_1,p_2,p_3;L,\{\bsxi_{lmn},w_{lmn}\}$)
 \State $\sfG\gets 0$\Comment{Initialize Gram Matrix}
 \For{$l,m,n=1$  to  $L$}
-            \State\textbf{call } Shape3L2($\bsxi_{lmn},p_1,p_2,p_3,\{\hat{\upsilon}_I(\bsxi_{lmn})\}$)
+            \State\textbf{call } Shape3L2($\bsxi_{lmn},p_1,p_2,p_3;\{\hat{\upsilon}_I(\bsxi_{lmn})\}$)
             \Comment{Evaluate 3D shape functions at $\bsxi_{lmn}$}
-            \State\textbf{call } geometry( $\bsxi_{lmn},mid,\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
-            \Comment{Compute jacobian}
+            \State\textbf{call } geometry( $\bsxi_{lmn},i_{el};\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
+            \Comment{Compute x and Jacobian}
             \For{$J=0$  to  $\spacedim Y^p-1$}
                 \For{$I=J$  to  $\spacedim Y^p-1$}
                     \State $\sfG_{IJ}\gets \sfG_{IJ}+\hat{\upsilon}_I(\bsxi_{lmn})\hat{\upsilon}_J(\bsxi_{lmn})|\mcJ|^{-1}w_{lmn}$ \Comment{Accumulate through (\ref{ip_l2conven})}
@@ -271,21 +287,21 @@ Additionally, see (\ref{GA_l2})-(\ref{ip_l2_GAB}) to notice the symmetry in $\mc
 \begin{algorithmic}
 \Procedure{L2GramTensor}{$i_{el},\sfG$}\Comment{Compute matrix $\sfG$ for element No. $i_{el}$ - Sum factorization}
 \State $p_{\max}\gets\max\{p_1,p_2,p_3\}$
-\State\textbf{call }setquadrature1D($i_{el},p_{\max}-1,L,\zeta^l,w^l$)
+\State\textbf{call }setquadrature1D($i_{el},p_{\max}-1;L,\{\zeta^l,w^l\}$)
 \State $\mcG\gets 0$\Comment{Initialize Gram Matrix}
 \For{$l=1$  to  $L$}    
-    \State\textbf{call } Shape1L2($\zeta^l,p_1,\nu_{i_1}(\zeta^l)\}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
+    \State\textbf{call } Shape1L2($\zeta^l,p_1;{\color{blue}\{\nu_{i_1}(\zeta^l)\}}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
     \For{$j_3=0$  to  $p_3-1$}
         \For{$i_3=j_3$  to  $p_3-1$}
             \State $\mcG^B\gets 0$
             \For{$m=1,L$}
-                \State\textbf{call } Shape1L2($\zeta^m,p_2,\nu_{i_2}(\zeta^m)\}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
+                \State\textbf{call } Shape1L2($\zeta^m,p_2;{\color{blue}\{\nu_{i_2}(\zeta^m)\}}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
                 \State $\mcG^A\gets 0$
                 \For{$n=1$  to  $L$}
-                    \State\textbf{call } Shape1L2($\zeta^n,p_3,\nu_{i_3}(\zeta^n)\}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
+                    \State\textbf{call } Shape1L2($\zeta^n,p_3;{\color{blue}\{\nu_{i_3}(\zeta^n)\}}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
                     \State $\bsxi_{lmn}\gets (\zeta^l,\zeta^m,\zeta^n)$
-                    \State\textbf{call } geometry( $\bsxi_{lmn},mid,\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
-                    \Comment{Compute jacobian}
+                    \State\textbf{call } geometry( $\bsxi_{lmn},i_{el};\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
+                    \Comment{Compute x and Jacobian}
                     \State$\mcG_{i_3j_3}^A\gets \mcG_{i_3j_3}^A+ \nu_{i_3}(\zeta^n)\nu_{j_3}(\zeta^n)|\mcJ|^{-1}w^n$ \Comment{Accumulate through (\ref{GA_l2_quad})}
                 \EndFor
                 \For{$j_2=0$  to  $p_2-1$}
@@ -298,7 +314,7 @@ Additionally, see (\ref{GA_l2})-(\ref{ip_l2_GAB}) to notice the symmetry in $\mc
                 \For{$i_2=j_2$  to  $p_2-1$}
                     \For{$j_1=0$  to  $p_1-1$}
                         \For{$i_1=j_1$  to  $p_1-1$}
-                            \State $\mcG_{i_1j_1i_2j_2i_3j_3}\gets \mcG_{i_ij_1i_2j_2i_3j_3}+ \nu_{i_1}(\zeta^l)\nu_{j_1}(\zeta^l)\mcG_{i_2j_2i_3j_3}^B(\zeta^l)w^l$ \Comment{From (\ref{ip_l2tensor})}
+                            \State $\mcG_{i_1j_1i_2j_2i_3j_3}\gets \mcG_{i_1j_1i_2j_2i_3j_3}+ \nu_{i_1}(\zeta^l)\nu_{j_1}(\zeta^l)\mcG_{i_2j_2i_3j_3}^B(\zeta^l)w^l$ \Comment{From (\ref{ip_l2tensor})}
                         \EndFor
                     \EndFor
                 \EndFor
@@ -311,7 +327,7 @@ Additionally, see (\ref{GA_l2})-(\ref{ip_l2_GAB}) to notice the symmetry in $\mc
 \end{algorithmic}
 \end{algorithm}
 
-Assuming that Algorithm \ref{algo:l2tensor} is used having uniform polynomial degree $p$, then the cost of the integration is driven by the accumulation for each index combination of $\mcG_{i_1ij_1i_2j_2i_3j_3}$, which is executed $p[\onehalf p(p+1)]^3$ times, making a cost of $\mcO(p^7)$.
+Assuming that Algorithm \ref{algo:l2tensor} is used having uniform polynomial degree $p$, then the cost of the integration is driven by the accumulation for each index combination of $\mcG_{i_1j_1i_2j_2i_3j_3}$, which is executed $p[\onehalf p(p+1)]^3$ times, making a cost of $\mcO(p^7)$.
 
 It is worth mentioning that the array $\mcG_{i_1ij_1i_2j_2i_3j_3}$ needs not be constructed, especially if taking into account computer memory issues. Instead, its value can be directly accumulated into the corresponding entry of $\sfG$.
 
@@ -334,21 +350,21 @@ This saving of two orders of magnitude will be observed in all the remaining cas
 \begin{algorithmic}
 \Procedure{L2GramTensor}{$i_{el},\sfG$}\Comment{Compute $\sfG$ for element No. $i_{el}$ - Alternative sum factorization}
 \State $p_{\max}\gets\max\{p_1,p_2,p_3\}$
-\State\textbf{call }setquadrature1D($i_{el},p_{\max}-1,L,\zeta^l,w^l$)
+\State\textbf{call }setquadrature1D($i_{el},p_{\max}-1;L,\{\zeta^l,w^l\}$)
 \State $\mcG\gets 0$\Comment{Initialize Gram Matrix}
 \For{$l=1$  to  $L$}    
-    \State\textbf{call } Shape1L2($\zeta^l,p_1,\nu_{i_1}(\zeta^l)\}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
+    \State\textbf{call } Shape1L2($\zeta^l,p_1;\{\nu_{i_1}(\zeta^l)\}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
     \State $\mcG^B\gets 0$
     \For{$m=1,L$}
-        \State\textbf{call } Shape1L2($\zeta^m,p_2,\nu_{i_2}(\zeta^m)\}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
+        \State\textbf{call } Shape1L2($\zeta^m,p_2;\{\nu_{i_2}(\zeta^m)\}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
         \State $\mcG^A\gets 0$
         \For{$n=1$  to  $L$}
-            \State\textbf{call } Shape1L2($\zeta^n,p_3,\nu_{i_3}(\zeta^n)\}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
+            \State\textbf{call } Shape1L2($\zeta^n,p_3;\{\nu_{i_3}(\zeta^n)\}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
             \For{$j_3=0$  to  $p_3-1$}
                 \For{$i_3=j_3$  to  $p_3-1$}
                     \State $\bsxi_{lmn}\gets (\zeta^l,\zeta^m,\zeta^n)$
-                    \State\textbf{call } geometry( $\bsxi_{lmn},mid,\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
-                    \Comment{Compute jacobian}
+                    \State\textbf{call } geometry( $\bsxi_{lmn},i_{el};\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
+                    \Comment{Compute x and Jacobian}
                     \State$\mcG_{i_3j_3}^A\gets \mcG_{i_3j_3}^A+ \nu_{i_3}(\zeta^n)\nu_{j_3}(\zeta^n)|\mcJ|^{-1}w^n$ \Comment{Accumulate through (\ref{GA_l2_quad})}
                 \EndFor
             \EndFor
@@ -408,7 +424,8 @@ This energy space is defined as follows:
     \hat{\nabla} \hat{v}=\left(\frac{\partial \hat{v}}{\partial\xi_1},\frac{\partial \hat{v}}{\partial\xi_2},\frac{\partial \hat{v}}{\partial\xi_3}\right) =\left(\hat{\partial}_1 \hat{v},\hat{\partial}_2 \hat{v}, \hat{\partial}_3 \hat{v}\right)
 \end{equation}
 
-The exact sequence in 3D described earlier, along with the Piola map definitions, imply that if $u\in\HSo^1(\mcK)$, then $\nabla u\in\HSo(\curl,\mcK)$ and that if $u=T^{\grad}\hat{u}$ for some $\hat{u}\in\HSo^hat\mcK)$, then $\nabla u=T^{\curl}\hat{\nabla}\hat{u}$. Of course, also $\hat{\nabla}\hat{u}\in\HSo(\curl,\hatK)$.
+The exact sequence in 3D described earlier, along with the Piola map definitions, imply that if $u\in\HSo^1(\mcK)$, then $\nabla u\in\HSo(\curl,\mcK)$ and that if $u=T^{\grad}\hat{u}$ for some $\hat{u}\in{\color{red}{\HSo^1(\hatK)}}$, then $\nabla u=T^{\curl}\hat{\nabla}\hat{u}$. Of course, also $\hat{\nabla}\hat{u}\in\HSo(\curl,\hatK)$.
+{\color{blue}In other words, we have the commutativity between the gradients and the Piola maps, i.e., $\nabla T^{\grad}=T^{\curl}\hat{\nabla}$.}
 
 Now, let the order of the shape functions for the master hexahedron be $(p_1,p_2,p_3)$, in the sense of the exact sequence. Consider a basis for $W^p$, $\left\{ \varphi_I \right\}_{I=0}^{\spacedim W^p-1}$, where $\spacedim W^p=(p_1+1)(p_2+2)(p_3+1)$. Thus, for any pair of integers $0\leq I,J<\spacedim W^p$ the inner product is obtained as derived in (\ref{h1ip_coupled}).
 
@@ -418,21 +435,21 @@ Analogously to the $L^2$ case, besides recalling the definitions of both $T^{\gr
                           \sfG^{\grad}_{IJ}  =\ &\left(\varphi_I,\varphi_J\right)_{\HSo^1(\mcK)} \nonumber\\
                                         \ =\ & \int\limits_{\mcK}\varphi_I(\bsx)\varphi_J(\bsx)d^3\bsx + \int\limits_{\mcK}[\nabla\varphi_I(\bsx)]^\T\nabla\varphi_J(\bsx)d^3\bsx \nonumber\\
                                         \ =\ & \int\limits_{\hatK}\varphi_I\circ\bfx_\mcK(\bsxi)\varphi_J\circ\bfx_\mcK(\bsxi)|\mcJ(\bsxi)|d^3\bsxi +
-                                        \int\limits_{\mcK}\left[\nabla\varphi_I\circ\bfx_\mcK(\bsxi)\right]^\T\nabla\varphi_J\circ\bfx_\mcK(\bsxi)|\mcJ(\bsxi)|d^3\bsxi \nonumber\\
+                                        \int\limits_{\hatK}\left[\nabla\varphi_I\circ\bfx_\mcK(\bsxi)\right]^\T\nabla\varphi_J\circ\bfx_\mcK(\bsxi)|\mcJ(\bsxi)|d^3\bsxi \nonumber\\
                                         \ =\ & \int\limits_{\hatK}
                                         \left(T^{\grad}\hat{\varphi}_I\circ\bfx_\mcK(\bsxi)\right)\left(T^{\grad}\hat{\varphi}_J\circ\bfx_\mcK(\bsxi)\right)|\mcJ(\bsxi)|d^3\bsxi \ +\nonumber\\*
-                                        \ & \int\limits_{\mcK}
+                                        \ & \int\limits_{\hatK}
                                         \left[\nabla\left(T^{\grad}\hat{\varphi}_I\right)\circ\bfx_\mcK(\bsxi)\right]^\T\left[\nabla \left(T^{\grad}\hat{\varphi}_J\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\
                                         =\ & \int\limits_{\hatK}
                                         \left(\left(\hat{\varphi}_I\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right)\left(\left(\hat{\varphi}_J\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right)|\mcJ(\bsxi)|d^3\bsxi \ +\nonumber\\*
-                                        \ & \int\limits_{\mcK}
+                                        \ & \int\limits_{\hatK}
                                         \left[\left(T^{\curl}\hat{\nabla}\hat{\varphi}_I\right)\circ\bfx_\mcK(\bsxi)\right]^\T \left[\left(T^{\curl}\hat{\nabla}\hat{\varphi}_J\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\
                                         =\ & \int\limits_{\hatK}
                                         \hat{\varphi}_I(\bsxi)\hat{\varphi}_J(\bsxi)|\mcJ(\bsxi)|d^3\bsxi \ +\nonumber\\*
-                                        \ & \int\limits_{\mcK}
+                                        \ & \int\limits_{\hatK}
                                         \left[\left((\mcJ^{-T}\hat{\nabla}\hat{\varphi}_I)\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right]^\T \left[\left((\mcJ^{-T}\hat{\nabla}\hat{\varphi}_J)\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\
                                         =\ & \int\limits_{\hatK}                \hat{\varphi}_I(\bsxi)\hat{\varphi}_J(\bsxi)|\mcJ(\bsxi)|d^3\bsxi +
-                                        \int\limits_{\mcK}             \left[\hat{\nabla}\hat{\varphi}_I(\bsxi)\right]^\T\mcD(\bsxi)\left[\hat{\nabla}\hat{\varphi}_J(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\
+                                        \int\limits_{\hatK}             \left[\hat{\nabla}\hat{\varphi}_I(\bsxi)\right]^\T\mcD(\bsxi)\left[\hat{\nabla}\hat{\varphi}_J(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\
                                         =\ & \int\limits_0^1\int\limits_0^1\int\limits_0^1\left\{\hat{\varphi}_I(\bsxi)\hat{\varphi}_J(\bsxi)+\left[\hat{\nabla}\hat{\varphi}_I(\bsxi)\right]^\T\mcD(\bsxi)\left[\hat{\nabla}\hat{\varphi}_J(\bsxi)\right]\right\}|\mcJ(\bsxi)|d\xi_3d\xi_2d\xi_1
     \label{h1ip_coupled}
 \end{align}
@@ -457,13 +474,13 @@ The conventional algorithm for (\ref{h1ip_coupled}) is presented as Algorithm \r
 \caption{Conventional computation of the $H^1$ Gram Matrix}\label{algo:h1conven}
 \begin{algorithmic}
 \Procedure{H1Gram}{$i_{el},\sfG^{\grad}$}\Comment{Compute matrix $\sfG^{\grad}$ for element No. $i_{el}$ - Conventional algorithm}
-\State\textbf{call }setquadrature3D($i_{el},p_1,p_2,p_3,L,\bsxi_{lmn},w_{lmn}$)
+\State\textbf{call }setquadrature3D($i_{el},p_1,p_2,p_3;L,\{\bsxi_{lmn},w_{lmn}\}$)
 \State $\sfG^{\grad} \gets 0$\Comment{Initialize Gram Matrix}
 \For{$l,m,n=1$  to  $L$}
-            \State\textbf{call } Shape3H1($\bsxi_{lmn},p_1,p_2,p_3,\{\hat{\varphi}_I(\bsxi_{lmn})\},\{\hat{\nabla}\hat{\varphi}_I(\bsxi_{lmn})\}$)
+            \State\textbf{call } Shape3H1($\bsxi_{lmn},p_1,p_2,p_3;\{\hat{\varphi}_I(\bsxi_{lmn})\},\{\hat{\nabla}\hat{\varphi}_I(\bsxi_{lmn})\}$)
             \Comment{3D shape functions at $\bsxi_{lmn}$}
-            \State\textbf{call } geometry( $\bsxi_{lmn},mid,\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
-            \Comment{Compute jacobian}
+            \State\textbf{call } geometry( $\bsxi_{lmn},i_{el};\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
+            \Comment{Compute x and Jacobian}
             \State $\mcD\gets\mcJ^{-1}(\bsxi_{lmn})\mcJ^{-T}(\bsxi_{lmn})$
             \For{$J=0$  to  $\spacedim W^p-1$}
                 \For{$I=J$  to  $\spacedim W^p-1$}
@@ -545,7 +562,7 @@ Additionally, a really intuitive yet handy function to manage that binary supers
 %
 % with $a,b=1,2,3$.
 
-Although this whole article has as an important point of reference the algorithm of sum factorization for the Helmholtz equation (whose stiffness matrix is really similar to a $H^1$ Gram matrix) in the dissertation of Jason Kurtz \cite{kurtz2007fully}, where each term of the factorized form of the integral conveyed a different auxiliary function, here we decide to provide a single definition of auxiliary functions at each level. These are followed by a sum over $a,b$, hence returning all the terms for the required Gram matrix. This new perspective was applied because one of the goals of the current work is to develop a general framework for the four spaces in the exact sequence. Consider the following definitions,
+Although this whole article has as an important point of reference the algorithm of sum factorization for the Helmholtz equation (whose stiffness matrix is really similar to {\color{blue}an} $H^1$ Gram matrix) in the dissertation of Jason Kurtz \cite{kurtz2007fully}, where each term of the factorized form of the integral conveyed a different auxiliary function, here we decide to provide a single definition of auxiliary functions at each level. These are followed by a sum over $a,b$, hence returning all the terms for the required Gram matrix. This new perspective was applied because one of the goals of the current work is to develop a general framework for the four spaces in the exact sequence. Consider the following definitions,
 % 
 \begin{align}
     \mcG_{ab;i_3j_3}^{\grad A}(\xi_1,\xi_2):=&\int\limits_0^1\chi_{i_3}^{\langle\delta_{3a}\rangle}(\xi_3)\chi_{j_3}^{\langle\delta_{3b}\rangle}(\xi_3) D_{ab}(\xi_1,\xi_2,\xi_3)|\mcJ(\xi_1,\xi_2,\xi_3)|d\xi_3,\label{GA_h1}\\
@@ -585,28 +602,28 @@ Given the auxiliary functions' definitions for this Gram matrix, some symmetries
 
 Having in mind the relations above, along with (\ref{GA_h1})-(\ref{ip_h1_GAB0}), we propose Algorithm \ref{algo:h1tensor} as the tensor-product-based method to compute the $H^1$ Gram matrix, in which a one-dimensional quadrature is applied to every coordinate, as seen in (\ref{GA_l2_quad})-(\ref{ip_l2tensor}). 
 
-If a uniform order $p$ is assumed in Algorithm \ref{algo:h1tensor}, we need at least $L=p+1$ for the integration, so the reader may estimate the operation count by summing the number of times the code line that accumulates $\mcG_{i_1ij_1i_2j_2i_3j_3}$ and verify that it is $\mcO[(p+1)^7]$, two orders of magnitude below Algorithm \ref{algo:h1conven}.
+If a uniform order $p$ is assumed in Algorithm \ref{algo:h1tensor}, we need at least $L=p+1$ for the integration, so the reader may estimate the operation count by summing the number of times the code line that accumulates $\mcG_{i_1j_1i_2j_2i_3j_3}$ and verify that it is $\mcO[(p+1)^7]$, two orders of magnitude below Algorithm \ref{algo:h1conven}.
 % 
 \begin{algorithm}[ht!]
 \caption{Computation of the $H^1$ Gram Matrix by sum factorization}\label{algo:h1tensor}
 \begin{algorithmic}
 \Procedure{H1GramTensor}{$i_{el},\sfG^{\grad}$}\Comment{Get $\sfG^{\grad}$ for element No. $i_{el}$ -Sum factorization}
 \State $p_{\max}\gets\max\{p_1,p_2,p_3\}$
-\State\textbf{call }setquadrature1D($i_{el},p_{\max},L,\zeta^l,w^l$)
+\State\textbf{call }setquadrature1D($i_{el},p_{\max};L,\{\zeta^l,w^l\}$)
 \State $\bar{\mcG}^{\grad},\mcG^{\grad}\gets 0$\Comment{Initialize Gram Matrix}
 \For{$l=1$  to  $L$}    
-    \State\textbf{call } Shape1H1($\zeta^l,p_1,\chi_{i_1}(\zeta^l),\chi_{i_1}'(\zeta^l)\}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
+    \State\textbf{call } Shape1H1($\zeta^l,p_1;\{\chi_{i_1}(\zeta^l),\chi_{i_1}'(\zeta^l)\}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
     \For{$j_3=0$  to  $p_3$}
         \For{$i_3=j_3$  to  $p_3$}
             \State $\bar{\mcG}^{\grad B},\mcG^{\grad B}\gets 0$
             \For{$m=1$  to  $L$}
-                \State\textbf{call } Shape1H1($\zeta^m,p_2,\chi_{i_2}(\zeta^m),\chi_{i_2}'(\zeta^m)\}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
+                \State\textbf{call } Shape1H1($\zeta^m,p_2;\{\chi_{i_2}(\zeta^m),\chi_{i_2}'(\zeta^m)\}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
                 \State $\bar{\mcG}^{\grad A},\mcG^{\grad A}\gets 0$
                 \For{$n=1$  to  $L$}
-                    \State\textbf{call } Shape1H1($\zeta^n,p_3,\chi_{i_3}(\zeta^n),\chi_{i_3}'(\zeta^n)\}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
+                    \State\textbf{call } Shape1H1($\zeta^n,p_3;\{\chi_{i_3}(\zeta^n),\chi_{i_3}'(\zeta^n)\}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
                     \State $\bsxi_{lmn}\gets (\zeta^l,\zeta^m,\zeta^n)$
-                    \State\textbf{call } geometry( $\bsxi_{lmn},mid,\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
-                    \Comment{Compute jacobian}
+                    \State\textbf{call } geometry( $\bsxi_{lmn},i_{el};\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
+                    \Comment{Compute x and Jacobian}
                     \State $\mcD\gets\mcJ^{-1}(\bsxi_{lmn})\mcJ^{-T}(\bsxi_{lmn})$
                     \State$\bar{\mcG}_{i_3j_3}^{\grad A}\gets \bar{\mcG}_{i_3j_3}^{\grad A}+ \chi_{i_3}(\zeta^n)\chi_{j_3}(\zeta^n)|\mcJ|w^n$ \Comment{Accumulate to obtain (\ref{GA0_h1})}
                     \For{$a,b=1$  to  $3$}
@@ -614,7 +631,7 @@ If a uniform order $p$ is assumed in Algorithm \ref{algo:h1tensor}, we need at l
                     \EndFor                    
                 \EndFor
                 \For{$j_2,i_2=0$  to  $p_2$}
-                    \State$\bar{\mcG}_{i_2j_2i_3j_3}^{\grad B}\gets \bar{\mcG}_{i_2j_2i_3j_3}^{\grad B}+ \chi_{i_2}(\zeta^m)\chi_{j_2}(\zeta^m)\hat{\mcG}_{i_3j_3}^{\grad A}(\zeta^l,\zeta^m)w^m$ \Comment{By (\ref{GB0_h1})}
+                    \State$\bar{\mcG}_{i_2j_2i_3j_3}^{\grad B}\gets \bar{\mcG}_{i_2j_2i_3j_3}^{\grad B}+ \chi_{i_2}(\zeta^m)\chi_{j_2}(\zeta^m)\bar{\mcG}_{i_3j_3}^{\grad A}(\zeta^l,\zeta^m)w^m$ \Comment{By (\ref{GB0_h1})}
                     \For{$a,b=1$  to  $3$}
                         \State$\mcG_{ab;i_2j_2i_3j_3}^{\grad B}\gets \mcG_{ab;i_2j_2i_3j_3}^{\grad B}+ \chi_{i_2}^{\langle\delta_{2a}\rangle}(\zeta^m)\chi_{j_2}^{\langle\delta_{2b}\rangle}(\zeta^m)\mcG_{ab;i_3j_3}^{\grad A}(\zeta^l,\zeta^m)w^m$ \Comment{By (\ref{GB_h1})}
                     \EndFor                    
@@ -659,7 +676,7 @@ This third space contains functions whose divergence is square integrable, i.e,
 
 \noindent where the spatial-coordinates divergence is:
 \begin{equation}
-    \div V=\partial_1 V_1+\partial_2 V_2+\partial_3 .
+    \div V=\partial_1 V_1+\partial_2 V_2+\partial_3 {\color{blue}V_3}.
 \end{equation}
 
 \noindent Furthermore, the divergence in the master element coordinates of a function $\hat{W}$ is:
@@ -668,7 +685,8 @@ This third space contains functions whose divergence is square integrable, i.e,
     \widehat{\div}\hat{W}=\hat{\partial}_1 \hat{W}_1+\hat{\partial}_2 \hat{W}_2+\hat{\partial}_3 \hat{W}_3.
 \end{equation}
 
-In a similar way to the previous problem, we have that if $V\in\HSo(\div,\mcK)$, then $\div V\in\Leb^2(\mcK)$; and that if $V=T^{\div}\hat{V}$ for some $\hat{V}\in\HSo(\div,\hatK)$, then $\div V=T\widehat{\div}\hat{V}$. Consequently, $\widehat{\div}\hat{V}\in\Leb^2(\hatK)$.
+In a similar way to the previous problem, we have that if $V\in\HSo(\div,\mcK)$
+{\color{blue} (and by definition $\div V\in\Leb^2(\mcK)$), if  $V=T^{\div}\hat{V}$ for some $\hat{V}\in\HSo(\div,\hatK)$ (with $\widehat{\div}\hat{V}\in\Leb^2(\hatK)$), then $\div V=T\widehat{\div}\hat{V}$ thanks to another commutativity that holds for this space: $\div T^{\div}=T\widehat{\div}$.}
 
 Now, let the order of the shape functions for the master hexahedron be $(p_1,p_2,p_3)$, in the sense of the exact sequence. Consider a basis for $V^p$, $\left\{ \vartheta_I \right\}_{I=0}^{\spacedim V^p-1}$, where $\spacedim V^p=(p_1+1)p_2p_3+(p_2+1)p_3p_1+(p_3+1)p_1p_2$. Central to the understanding of this third space is to remind that its elements are vector-valued functions. As in the $H^1$ case, the definitions of both $T^{\div}$ and $T$ need to be invoked in (\ref{hdivip_coupled}). With this in mind, we take the same steps as above to achieve an expression suitable for sum factorization on the $H(\div)$ Gram matrix, below denoted $\sfG^{\div}$. Thus, for any pair of integers $0\leq I,J<\spacedim V^p$ the inner product is obtained as follows:
 % 
@@ -676,22 +694,22 @@ Now, let the order of the shape functions for the master hexahedron be $(p_1,p_2
                           \sfG^{\div}_{IJ}  =\ &\left(\vartheta_I,\vartheta_J\right)_{\HSo(\div,\mcK)} \nonumber\\
                                         \ =\ & \int\limits_{\mcK}\vartheta_I(\bsx)^\T\vartheta_J(\bsx)d^3\bsx + \int\limits_{\mcK}\div\vartheta_I(\bsx)\div\vartheta_J(\bsx)d^3\bsx \nonumber\\ 
                                         \ =\ & \int\limits_{\hatK}\left[\vartheta_I\circ\bfx_\mcK(\bsxi)\right]^\T\left[\vartheta_J\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi +
-                                        \int\limits_{\mcK}\div\vartheta_I\circ\bfx_\mcK(\bsxi)\div\vartheta_J\circ\bfx_\mcK(\bsxi)|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
+                                        \int\limits_{\hatK}\div\vartheta_I\circ\bfx_\mcK(\bsxi)\div\vartheta_J\circ\bfx_\mcK(\bsxi)|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
                                         \ =\ & \int\limits_{\hatK}
                                         \left[T^{\div}\hat{\vartheta}_I\circ\bfx_\mcK(\bsxi)\right]^\T\left[T^{\div}\hat{\vartheta}_J\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \ +\nonumber\\*
-                                        \ & \int\limits_{\mcK}
+                                        \ & \int\limits_{\hatK}
                                         \left[\div\left(T^{\div}\hat{\vartheta}_I\right)\circ\bfx_\mcK(\bsxi)\right]\left[\div \left(T^{\div}\hat{\vartheta}_J\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
                                         =\ & \int\limits_{\hatK}
                                         \left[\left(|\mcJ|^{-1}\mcJ\hat{\vartheta}_I\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right]^\T\left[\left(|\mcJ|^{-1}\mcJ\hat{\vartheta}_J\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \ +\nonumber\\*
-                                        \ & \int\limits_{\mcK}
+                                        \ & \int\limits_{\hatK}
                                         \left[\left(T\widehat{\div}\hat{\vartheta}_I\right)\circ\bfx_\mcK(\bsxi)\right] \left[\left(T\widehat{\div}\hat{\vartheta}_J\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
                                         =\ & \int\limits_{\hatK}
                                         \hat{\vartheta}_I(\bsxi)^\T\mcC(\bsxi)\hat{\vartheta}_J(\bsxi)|\mcJ^{-1}(\bsxi)|d^3\bsxi \ +\nonumber\\*
-                                        \ & \int\limits_{\mcK}
+                                        \ & \int\limits_{\hatK}
                                         \left[\left((|\mcJ|^{-1}\widehat{\div}\hat{\vartheta}_I)\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right] \left[\left((|\mcJ|^{-1}\widehat{\div}\hat{\vartheta}_J)\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
                                         =\ & \int\limits_{\hatK}
                                         \hat{\vartheta}_I(\bsxi)^\T\mcC(\bsxi)\hat{\vartheta}_J(\bsxi)|\mcJ(\bsxi)|^{-1}d^3\bsxi +
-                                        \int\limits_{\mcK}             \widehat{\div}\hat{\vartheta}_I(\bsxi)\widehat{\div}\hat{\vartheta}_J(\bsxi)|\mcJ(\bsxi)|^{-1}d^3\bsxi \nonumber \\ 
+                                        \int\limits_{\hatK}             \widehat{\div}\hat{\vartheta}_I(\bsxi)\widehat{\div}\hat{\vartheta}_J(\bsxi)|\mcJ(\bsxi)|^{-1}d^3\bsxi \nonumber \\ 
                                         =\ & \int\limits_0^1\int\limits_0^1\int\limits_0^1\left\{\hat{\vartheta}_I(\bsxi)^\T\mcC(\bsxi)\hat{\vartheta}_J(\bsxi)+\widehat{\div}\hat{\vartheta}_I(\bsxi)\widehat{\div}\hat{\vartheta}_J(\bsxi)\right\}|\mcJ(\bsxi)|^{-1}d\xi_3d\xi_2d\xi_1.
     \label{hdivip_coupled}
 \end{align}
@@ -716,13 +734,13 @@ The conventional algorithm for (\ref{hdivip_coupled}) is presented as Algorithm 
 \caption{Conventional computation of the $H(\div)$ Gram Matrix}\label{algo:hdivconven}
 \begin{algorithmic}
 \Procedure{HdivGram}{$i_{el},\sfG^{\div}$}\Comment{Compute matrix $\sfG^{\div}$ for element No. $i_{el}$ - Conventional algorithm}
-\State\textbf{call }setquadrature3D($i_{el},p_1,p_2,p_3,L,\bsxi_{lmn},w_{lmn}$)
+\State\textbf{call }setquadrature3D($i_{el},p_1,p_2,p_3;L,\{\bsxi_{lmn},w_{lmn}\}$)
 \State $\sfG^{\div} \gets 0$\Comment{Initialize Gram Matrix}
 \For{$l,m,n=1$  to  $L$}
-            \State\textbf{call } Shape3Hdiv($\bsxi_{lmn},p_1,p_2,p_3,\{\hat{\vartheta}_I(\bsxi_{lmn})\},\{\widehat{\div}\hat{\vartheta}_I(\bsxi_{lmn})\}$)
+            \State\textbf{call } Shape3Hdiv($\bsxi_{lmn},p_1,p_2,p_3;\{\hat{\vartheta}_I(\bsxi_{lmn})\},\{\widehat{\div}\hat{\vartheta}_I(\bsxi_{lmn})\}$)
             \Comment{3D shape functions at $\bsxi_{lmn}$}
-            \State\textbf{call } geometry( $\bsxi_{lmn},mid,\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
-            \Comment{Compute jacobian}
+            \State\textbf{call } geometry( $\bsxi_{lmn},i_{el};\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
+            \Comment{Compute x and Jacobian}
             \State $\mcC\gets\mcJ^\T(\bsxi_{lmn})\mcJ(\bsxi_{lmn})$
             \For{$J=0$  to  $\spacedim V^p-1$}
                 \For{$I=J$  to  $\spacedim V^p-1$}
@@ -756,9 +774,9 @@ The sum factorization process for the present situation begins by defining a ten
 \noindent where it is recalled that $\left\{\chi_{i_a}\right\}_{i_a=0}^{p_a}$ are a hierarchical basis of $W^{p_a}_{\mcI}$, while $\left\{\nu_{i_a}\right\}_{i_a=0}^{p_a-1}$ form a basis for $Y^{p_a}_{\mcI}$ (for $a=1,2,3$). In this new scenario, the integer indices $i_a,j_a$ depend on the vector component where $\hat{\vartheta}_I$ lies. The correspondence formula between the tensor-product index $I$ and the one-dimensional ones could be of the form
 \begin{equation}
     I=  \begin{cases}
-            i_1+(p_1+1)i_2+(p_1+1)p_2i_3 & \text{ if }$a=1$,\\
-            (p_1+1)p_2p_3+i_1+p_1i_2+p_1(p_2+1)i_3 & \text{ if }$a=2$,\\
-            (p_1+1)p_2p_3+p_1(p_2+1)p_3+i_1+p_1i_2+p_1p_2i_3 & \text{ if }$a=3$.
+            i_1+(p_1+1)i_2+(p_1+1)p_2i_3 & \text{ if }a=1,\\
+            (p_1+1)p_2p_3+i_1+p_1i_2+p_1(p_2+1)i_3 & \text{ if }a=2,\\
+            (p_1+1)p_2p_3+p_1(p_2+1)p_3+i_1+p_1i_2+p_1p_2i_3 & \text{ if }a=3.
         \end{cases}
         \label{hdivtensorindex}
 \end{equation}
@@ -782,11 +800,17 @@ By combining (\ref{hdivtensor}), (\ref{hdivrule}) and (\ref{hierarchicalrelation
 \noindent with $0\leq i_a\leq p_a$, $0\leq i_{a+1}<p_{a+1}$, $0\leq i_{a+2}<p_{a+2}$; where $a=1,2,3$ and the indices $(a,a+1,a+2)$ are interpreted as a cyclic permutation of $(1,2,3)$.
 % If $i_a=0$ we need to have a definition for $\nu_{i_a-1}$, namely $\nu_{-1}:=\chi_{0}'$.
 
-Notice that if we introduce an additional identifier to the index, we can restate the shape function in terms of $(\xi_1,\xi_2,\xi_3)$ which is desirable before the integral nesting of the tensor-product-based algorithm. As above, a Kronecker delta associated to the vector component where the shape function lies can do that work for us. Additionally, the notation convention to know if we need $\chi$ or its derivative turns again useful. Making use of (\ref{chisuperscript}) jointly with the Kronecker delta idea for the index, we can obtain new equations for $\hat{\vartheta}_I$ and $\widehat{\div}\hat{\vartheta}_I$, for which the effect of (the component index) $a$ on each univariate polynomial is obtained more systematically than in (\ref{divtensor0}) and (\ref{divtensor1}), respectively.
+Notice that if we introduce an additional identifier to the index, we can restate the shape function in terms of $(\xi_1,\xi_2,\xi_3)$ which is desirable before the integral nesting of the tensor-product-based algorithm. As above, a Kronecker delta associated to the vector component where the shape function lies can do that work for us. 
+{\color{blue} But in this case, as seen in \eqref{divtensor0}, we require the derivative in the factors depending on the coordinates other than $\xi_a$, so we need a \emph{complement} of the Kronecker delta. For that purpose we make a new definition: 
+\begin{equation*}
+    \gamma_{cd}=1-\delta_{cd}\quad\text{for}\quad c,d=1,2,3.
+\end{equation*}}
+
+Additionally, the notation convention to know if we need $\chi$ or its derivative turns again useful. Making use of (\ref{chisuperscript}) jointly with the Kronecker delta complement for the index, we can obtain new equations for $\hat{\vartheta}_I$ and $\widehat{\div}\hat{\vartheta}_I$, for which the effect of (the component index) $a$ on each univariate polynomial is obtained more systematically than in (\ref{divtensor0}) and (\ref{divtensor1}), respectively. 
 % 
 \begin{align}
-    \hat{\vartheta}_I(\xi_1,\xi_2,\xi_3)&= \chi_{i_1+1-\delta_{1a}}^{\langle1-\delta_{1a}\rangle}(\xi_1)\chi_{i_2+1-\delta_{2a}}^{\langle1-\delta_{2a}\rangle}(\xi_2) \chi_{i_3+1-\delta_{3a}}^{\langle1-\delta_{3a}\rangle}(\xi_3)\hat{\bfe}_a,\label{divtensor0delta}\\
-    \widehat{\div}\hat{\vartheta}_I(\xi_1,\xi_2,\xi_3)&=\chi_{i_1+1-\delta_{1a}}'(\xi_1)\chi_{i_2+1-\delta_{2a}}'(\xi_2)\chi_{i_3+1-\delta_{3a}}'(\xi_3). \label{divtensor1delta}
+    \hat{\vartheta}_I(\xi_1,\xi_2,\xi_3)&= \chi_{i_1+\gamma_{1a}}^{\langle\gamma_{1a}\rangle}(\xi_1)\chi_{i_2+\gamma_{2a}}^{\langle\gamma_{2a}\rangle}(\xi_2) \chi_{i_3+\gamma_{3a}}^{\langle\gamma_{3a}\rangle}(\xi_3)\hat{\bfe}_a,\label{divtensor0delta}\\
+    \widehat{\div}\hat{\vartheta}_I(\xi_1,\xi_2,\xi_3)&=\chi_{i_1+\gamma_{1a}}'(\xi_1)\chi_{i_2+\gamma_{2a}}'(\xi_2)\chi_{i_3+\gamma_{3a}}'(\xi_3). \label{divtensor1delta}
 \end{align}
 
 Using (\ref{divtensor1delta}) in the second term of the Gram matrix entry derived in (\ref{hdivip_coupled}) we get to
@@ -794,7 +818,7 @@ Using (\ref{divtensor1delta}) in the second term of the Gram matrix entry derive
 \begin{align}
     \int\limits_{\hatK}\widehat{\div}\hat{\vartheta}_I\widehat{\div}\hat{\vartheta}_J|\mcJ|^{-1}d^3\bsxi
     =&
-        \int\limits_{\hatK}\chi_{i_1+1-\delta_{1a}}'\chi_{i_2+1-\delta_{2a}}'\chi_{i_3+1-\delta_{3a}}' \chi_{j_1+1-\delta_{1b}}'\chi_{j_2+1-\delta_{2b}}'\chi_{j_3+1-\delta_{3b}}'|\mcJ|^{-1}d^3\bsxi,
+        \int\limits_{\hatK}\chi_{i_1+\gamma_{1a}}'\chi_{i_2+\gamma_{2a}}'\chi_{i_3+\gamma_{3a}}' \chi_{j_1+\gamma_{1b}}'\chi_{j_2+\gamma_{2b}}'\chi_{j_3+\gamma_{3b}}'|\mcJ|^{-1}d^3\bsxi,
         \label{hdivterm2}
 \end{align}
 
@@ -805,10 +829,10 @@ Take (\ref{divtensor0delta}) as a representation of the $H(\div)$ shape function
 \begin{align}
     \int\limits_{\hatK}\hat{\vartheta}_I^\T\mcC\hat{\vartheta}_J|\mcJ|^{-1}d^3\bsxi
     =& \int\limits_{\hatK}
-    \chi_{i_1+1-\delta_{1a}}^{\langle1-\delta_{1a}\rangle}\chi_{i_2+1-\delta_{2a}}^{\langle1-\delta_{2a}\rangle}\chi_{i_3+1-\delta_{3a}}^{\langle1-\delta_{3a}\rangle}\hat{\bfe}_a^\T \mcC \chi_{j_1+1-\delta_{1b}}^{\langle1-\delta_{1b}\rangle}\chi_{j_2+1-\delta_{2b}}^{\langle1-\delta_{2b}\rangle}\chi_{j_3+1-\delta_{3b}}^{\langle1-\delta_{3b}\rangle}\hat{\bfe}_b |\mcJ|^{-1}d^3\bsxi\nonumber\\
+    \chi_{i_1+\gamma_{1a}}^{\langle\gamma_{1a}\rangle}\chi_{i_2+\gamma_{2a}}^{\langle\gamma_{2a}\rangle}\chi_{i_3+\gamma_{3a}}^{\langle\gamma_{3a}\rangle}\hat{\bfe}_a^\T\; \mcC\; \chi_{j_1+\gamma_{1b}}^{\langle\gamma_{1b}\rangle}\chi_{j_2+\gamma_{2b}}^{\langle\gamma_{2b}\rangle}\chi_{j_3+\gamma_{3b}}^{\langle\gamma_{3b}\rangle}\;\hat{\bfe}_b\; |\mcJ|^{-1}d^3\bsxi\nonumber\\
     \begin{split}
-    =& \int\limits_0^1 \chi_{i_1+1-\delta_{1a}}^{\langle1-\delta_{1a}\rangle}\chi_{j_1+1-\delta_{1b}}^{\langle1-\delta_{1b}\rangle}\left\{\int\limits_0^1 \chi_{i_2+1-\delta_{2a}}^{\langle1-\delta_{2a}\rangle}\chi_{j_2+1-\delta_{2b}}^{\langle1-\delta_{2b}\rangle} \left[ \int\limits_0^1
-    \chi_{i_3+1-\delta_{3a}}^{\langle1-\delta_{3a}\rangle}\chi_{j_3+1-\delta_{3b}}^{\langle1-\delta_{3b}\rangle}C_{ab} |\mcJ|^{-1} d\xi_3\right]d\xi_2\right\}d\xi_1,
+    =& \int\limits_0^1 \chi_{i_1+\gamma_{1a}}^{\langle\gamma_{1a}\rangle}\chi_{j_1+\gamma_{1b}}^{\langle\gamma_{1b}\rangle}\left\{\int\limits_0^1 \chi_{i_2+\gamma_{2a}}^{\langle\gamma_{2a}\rangle}\chi_{j_2+\gamma_{2b}}^{\langle\gamma_{2b}\rangle} \left[ \int\limits_0^1
+    \chi_{i_3+\gamma_{3a}}^{\langle\gamma_{3a}\rangle}\chi_{j_3+\gamma_{3b}}^{\langle\gamma_{3b}\rangle}C_{ab} |\mcJ|^{-1} d\xi_3\right]d\xi_2\right\}d\xi_1,
     \end{split}
         \label{hdivterm1}
 \end{align}
@@ -819,11 +843,11 @@ This is where the corresponding auxiliary functions for $H(\div)$ are introduced
 % We need three levels of those, and we can generalize a definition with the help of superindices that will refer to the convention (\ref{chisuperscript}).
 % 
 \begin{align}
-    \mcG^{\div A}_{ab;i_3j_3}(\xi_1,\xi_2):={}&\int\limits_0^1 \chi_{i_3+1-\delta_{3a}}^{\langle1-\delta_{3a}\rangle}(\xi_3)\chi_{j_3+1-\delta_{3b}}^{\langle1-\delta_{3b}\rangle}(\xi_3) C_{ab}(\xi_1,\xi_2,\xi_3) |\mcJ(\xi_1,\xi_2,\xi_3)|^{-1} d\xi_3,\label{GA_hdiv}\\
-    \mcG^{\div B}_{ab;i_2j_2i_3j_3}(\xi_1):={}&\int\limits_0^1 \chi_{i_2+1-\delta_{2a}}^{\langle1-\delta_{2a}\rangle}(\xi_2)\chi_{j_2+1-\delta_{2b}}^{\langle1-\delta_{2b}\rangle}(\xi_2)
+    \mcG^{\div A}_{ab;i_3j_3}(\xi_1,\xi_2):={}&\int\limits_0^1 \chi_{i_3+\gamma_{3a}}^{\langle\gamma_{3a}\rangle}(\xi_3)\chi_{j_3+\gamma_{3b}}^{\langle\gamma_{3b}\rangle}(\xi_3) C_{ab}(\xi_1,\xi_2,\xi_3) |\mcJ(\xi_1,\xi_2,\xi_3)|^{-1} d\xi_3,\label{GA_hdiv}\\
+    \mcG^{\div B}_{ab;i_2j_2i_3j_3}(\xi_1):={}&\int\limits_0^1 \chi_{i_2+\gamma_{2a}}^{\langle\gamma_{2a}\rangle}(\xi_2)\chi_{j_2+\gamma_{2b}}^{\langle\gamma_{2b}\rangle}(\xi_2)
     \mcG^{\div A}_{ab;i_3j_3}(\xi_1,\xi_2) d\xi_2,\label{GB_hdiv}\\
-    \mcG^{\div}_{ab;i_1j_2i_2j_2i_3j_3}(\xi_1):={}&\int\limits_0^1
-    \chi_{i_1+1-\delta_{1a}}^{\langle1-\delta_{1a}\rangle}(\xi_1)\chi_{j_1+1-\delta_{1b}}^{\langle1-\delta_{1b}\rangle}(\xi_1)
+    \mcG^{\div}_{ab;i_1j_1i_2j_2i_3j_3}:={}&\int\limits_0^1
+    \chi_{i_1+\gamma_{1a}}^{\langle\gamma_{1a}\rangle}(\xi_1)\chi_{j_1+\gamma_{1b}}^{\langle\gamma_{1b}\rangle}(\xi_1)
     \mcG^{\div B}_{ab;i_2j_2i_3j_3}(\xi_1) d\xi_1.\label{ip_hdiv_GAB}
 \end{align}
 
@@ -836,34 +860,34 @@ Recall that the second term of the inner product, written in tensor-product form
 \begin{algorithmic}
 \Procedure{HdivGramTensor}{$i_{el},\sfG^{\div}$}\Comment{$\sfG^{\div}$ for element No. $i_{el}$ - Sum factorization}
 \State $p_{\max}\gets\max\{p_1,p_2,p_3\}$
-\State\textbf{call }setquadrature1D($i_{el},p_{\max},L,\zeta^l,w^l$)
+\State\textbf{call }setquadrature1D($i_{el},p_{\max};L,\{\zeta^l,w^l\}$)
 \State $\mcG^{\div},\tilde{\mcG}^{\div}\gets 0$\Comment{Initialize Gram Matrix}
 \For{$l=1$  to  $L$}    
-    \State\textbf{call } Shape1H1($\zeta^l,p_1,\chi_{i_1}(\zeta^l),\chi_{i_1}'(\zeta^l)\}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
+    \State\textbf{call } Shape1H1($\zeta^l,p_1;\{\chi_{i_1}(\zeta^l),\chi_{i_1}'(\zeta^l)\}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
     \For{$j_3=0$  to  $p_3$}
         \For{$i_3=j_3$  to  $p_3$}
             \State $\mcG^{\div B},\tilde{\mcG}^{\div B}\gets 0$
             \For{$m=1$  to  $L$}
-                \State\textbf{call } Shape1H1($\zeta^m,p_2,\chi_{i_2}(\zeta^m),\chi_{i_2}'(\zeta^m)\}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
+                \State\textbf{call } Shape1H1($\zeta^m,p_2;\{\chi_{i_2}(\zeta^m),\chi_{i_2}'(\zeta^m)\}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
                 \State $\mcG^{\div A},\tilde{\mcG}^{\div A}\gets 0$
                 \For{$n=1$  to  $L$}
-                    \State\textbf{call } Shape1H1($\zeta^n,p_3,\chi_{i_3}(\zeta^n),\chi_{i_3}'(\zeta^n)\}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
+                    \State\textbf{call } Shape1H1($\zeta^n,p_3;\{\chi_{i_3}(\zeta^n),\chi_{i_3}'(\zeta^n)\}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
                     \State $\bsxi_{lmn}\gets (\zeta^l,\zeta^m,\zeta^n)$
-                    \State\textbf{call } geometry( $\bsxi_{lmn},mid,\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
-                    \Comment{Compute jacobian}
+                    \State\textbf{call } geometry( $\bsxi_{lmn},i_{el};\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
+                    \Comment{Compute x and Jacobian}
                     \State $\mcC\gets\mcJ^\T(\bsxi_{lmn})\mcJ(\bsxi_{lmn})$
                     \For{$a,b=1$  to  $3$}
-                        \If{$j_3+1-\delta_{3b}\leq p_3$ and $i_3+1-\delta_{3a}\leq p_3$}\Comment{Avoids extra computations}
-                            \State$\mcG_{ab;i_3j_3}^{\div A}\gets \mcG_{ab;i_3j_3}^{\div A} + \chi_{i_3+1-\delta_{3a}}^{\langle1-\delta_{3a}\rangle}(\zeta^n) \chi_{j_3+1-\delta_{3b}}^{\langle1-\delta_{3b}\rangle}(\zeta^n) C_{ab} |\mcJ|^{-1} w^n$ \Comment{To obtain (\ref{GA_hdiv})}
-                            \State$\tilde{\mcG}_{ab;i_3j_3}^{\div A}\gets \tilde{\mcG}_{ab;i_3j_3}^{\div A} + \chi_{i_3+1-\delta_{3a}}'(\zeta^n) \chi_{j_3+1-\delta_{3b}}'(\zeta^n) |\mcJ|^{-1} w^n$
+                        \If{$j_3+\gamma_{3b}\leq p_3$ and $i_3+\gamma_{3a}\leq p_3$}\Comment{Avoids extra computations}
+                            \State$\mcG_{ab;i_3j_3}^{\div A}\gets \mcG_{ab;i_3j_3}^{\div A} + \chi_{i_3+\gamma_{3a}}^{\langle\gamma_{3a}\rangle}(\zeta^n) \chi_{j_3+\gamma_{3b}}^{\langle\gamma_{3b}\rangle}(\zeta^n) C_{ab} |\mcJ|^{-1} w^n$ \Comment{To obtain (\ref{GA_hdiv})}
+                            \State$\tilde{\mcG}_{ab;i_3j_3}^{\div A}\gets \tilde{\mcG}_{ab;i_3j_3}^{\div A} + \chi_{i_3+\gamma_{3a}}'(\zeta^n) \chi_{j_3+\gamma_{3b}}'(\zeta^n) |\mcJ|^{-1} w^n$
                         \EndIf
                     \EndFor
                 \EndFor
                 \For{$j_2,i_2=0$  to  $p_2$}
                         \For{$a,b=1$  to  $3$}
-                                \If{$j_2+1-\delta_{2b}\leq p_2$ and $i_2+1-\delta_{2a}\leq p_2$}\Comment{Avoids extra computations}
-                                    \State$\mcG_{ab;i_2j_2i_3j_3}^{\div B}\gets \mcG_{ab;i_2j_2i_3j_3}^{\div B} + \chi_{i_2+1-\delta_{2a}}^{\langle1-\delta_{2a}\rangle}(\zeta^m) \chi_{j_2+1-\delta_{2b}}^{\langle1-\delta_{2b}\rangle}(\zeta^m) \mcG_{ab;i_3j_3}^{\div A} w^m$ \Comment{(\ref{GB_hdiv})}
-                                    \State$\tilde{\mcG}_{ab;i_2j_2i_3j_3}^{\div B}\gets \tilde{\mcG}_{ab;i_2j_2i_3j_3}^{\div B} + \chi_{i_2+1-\delta_{2a}}'(\zeta^m) \chi_{j_2+1-\delta_{2b}}'(\zeta^m) \tilde{\mcG}_{ab;i_3j_3}^{\div A} w^m$
+                                \If{$j_2+\gamma_{2b}\leq p_2$ and $i_2+\gamma_{2a}\leq p_2$}\Comment{Avoids extra computations}
+                                    \State$\mcG_{ab;i_2j_2i_3j_3}^{\div B}\gets \mcG_{ab;i_2j_2i_3j_3}^{\div B} + \chi_{i_2+\gamma_{2a}}^{\langle\gamma_{2a}\rangle}(\zeta^m) \chi_{j_2+\gamma_{2b}}^{\langle\gamma_{2b}\rangle}(\zeta^m) \mcG_{ab;i_3j_3}^{\div A} w^m$ \Comment{(\ref{GB_hdiv})}
+                                    \State$\tilde{\mcG}_{ab;i_2j_2i_3j_3}^{\div B}\gets \tilde{\mcG}_{ab;i_2j_2i_3j_3}^{\div B} + \chi_{i_2+\gamma_{2a}}'(\zeta^m) \chi_{j_2+\gamma_{2b}}'(\zeta^m) \tilde{\mcG}_{ab;i_3j_3}^{\div A} w^m$
                                 \EndIf
                         \EndFor       
                 \EndFor
@@ -873,9 +897,9 @@ Recall that the second term of the inner product, written in tensor-product form
                             \State Determine $I,J$ through (\ref{hdivtensorindex})
                             \If{$J\geq I$}
                                 \For{$a,b=1$  to  $3$}
-                                        \If{$j_1+1-\delta_{1b}\leq p_1$ and $i_1+1-\delta_{1a}\leq p_1$}\Comment{Avoids extra computations}
-                                            \State$\mcG_{ab;i_1j_1i_2j_2i_3j_3}^{\div}\gets \mcG_{ab;i_1j_1i_2j_2i_3j_3}^{\div} + \chi_{i_1+1-\delta_{1a}}^{\langle1-\delta_{1a}\rangle}(\zeta^l) \chi_{j_1+1-\delta_{1b}}^{\langle1-\delta_{1b}\rangle}(\zeta^l) \mcG_{ab;i_2j_2i_3j_3}^{\div B} w^l$ 
-                                            \State$\tilde{\mcG}_{ab;i_1j_1i_2j_2i_3j_3}^{\div}\gets \tilde{\mcG}_{ab;i_1j_1i_2j_2i_3j_3}^{\div} + \chi_{i_1+1-\delta_{1a}}'(\zeta^l) \chi_{j_1+1-\delta_{1b}}'(\zeta^l) \tilde{\mcG}_{ab;i_2j_2i_3j_3}^{B} w^l$
+                                        \If{$j_1+\gamma_{1b}\leq p_1$ and $i_1+\gamma_{1a}\leq p_1$}\Comment{Avoids extra computations}
+                                            \State$\mcG_{ab;i_1j_1i_2j_2i_3j_3}^{\div}\gets \mcG_{ab;i_1j_1i_2j_2i_3j_3}^{\div} + \chi_{i_1+\gamma_{1a}}^{\langle\gamma_{1a}\rangle}(\zeta^l) \chi_{j_1+\gamma_{1b}}^{\langle\gamma_{1b}\rangle}(\zeta^l) \mcG_{ab;i_2j_2i_3j_3}^{\div B} w^l$ 
+                                            \State$\tilde{\mcG}_{ab;i_1j_1i_2j_2i_3j_3}^{\div}\gets \tilde{\mcG}_{ab;i_1j_1i_2j_2i_3j_3}^{\div} + \chi_{i_1+\gamma_{1a}}'(\zeta^l) \chi_{j_1+\gamma_{1b}}'(\zeta^l) \tilde{\mcG}_{ab;i_2j_2i_3j_3}^{B} w^l$
                                         \EndIf
                                 \EndFor
                             \EndIf
@@ -918,7 +942,8 @@ The last energy space needs its functions to have a square-integrable curl. It i
     \widehat{\curl} \hat{F}=\left(\hat{\partial}_2 \hat{F}_3-\hat{\partial}_3 \hat{F}_2,\hat{\partial}_3 \hat{F}_1-\hat{\partial}_1 \hat{F}_3,\hat{\partial}_1 \hat{F}_2-\hat{\partial}_2 \hat{F}_1\right).
 \end{equation}
 
-In a similar way to the previous problem, we have that if $E\in\HSo(\curl,\mcK)$, then $\curl E\in\HSo(\div,\mcK)$ and that if $E=T^{\curl}\hat{E}$ for some $\hat{E}\in\HSo(\curl,\hatK)$, then $\curl E=T^{\div}\widehat{\curl}\hat{E}$. Consequently, $\widehat{\curl}\hat{E}\in\HSo(\div,\hatK)$.
+\noindent {\color{blue}In this last space, the commutativity that is applicable to our derivations is given by $\curl T^{\curl}=T^{\div}\widehat{\curl}$.}
+% In a similar way to the previous problem, we have that if $E\in\HSo(\curl,\mcK)$, then $\curl E\in\HSo(\div,\mcK)$ and that if $E=T^{\curl}\hat{E}$ for some $\hat{E}\in\HSo(\curl,\hatK)$, then $\curl E=T^{\div}\widehat{\curl}\hat{E}$. Consequently, $\widehat{\curl}\hat{E}\in\HSo(\div,\hatK)$.
 
 Now, let the order of the shape functions for the master hexahedron be $(p_1,p_2,p_3)$, in the sense of the exact sequence. Consider a basis for $Q^p$, $\left\{ \psi_I \right\}_{I=0}^{\spacedim Q^p-1}$, where $\spacedim Q^p=p_1(p_2+1)(p_3+1)+(p_1+1)p_2(p_3+1)+(p_1+1)(p_2+1)p_3$. In this fourth energy space the elements are vector-valued functions too. As in the $H^1$ and $H(\div)$ cases, the definitions of both $T^{\curl}$ and $T^{\div}$ need to be invoked during the derivation of (\ref{hcurlip_coupled}). Taking in consideration the previous problems, we take the same steps in order to obtain an expression suitable for the sum factorization of the $H(\curl)$ Gram matrix, hereinafter called $\sfG^{\curl}$. Thus, for any pair of integers $0\leq I,J<\spacedim Q^p$ the inner product is equivalent to the following expressions,
 %
@@ -926,22 +951,22 @@ Now, let the order of the shape functions for the master hexahedron be $(p_1,p_2
 \sfG^{\curl}_{IJ}  =\ &\left( \psi_I, \psi_J\right)_{\HSo(\curl,\mcK)} \nonumber\\
                 \ =\ & \int\limits_{\mcK} \psi_I(\bsx)^\T \psi_J(\bsx)d^3\bsx + \int\limits_{\mcK}\left[\curl \psi_I(\bsx)\right]^\T\left[\curl \psi_J(\bsx)\right]d^3\bsx \nonumber\\ 
                 \ =\ & \int\limits_{\hatK}\left[ \psi_I\circ\bfx_\mcK(\bsxi)\right]^\T\left[ \psi_J\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi +
-                \int\limits_{\mcK}\left[\curl \psi_I\circ\bfx_\mcK(\bsxi)\right]^\T\left[\curl \psi_J\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
+                \int\limits_{\hatK}\left[\curl \psi_I\circ\bfx_\mcK(\bsxi)\right]^\T\left[\curl \psi_J\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
                 \ =\ & \int\limits_{\hatK}
                 \left[ T^{\curl}\hat{ \psi}_I\circ\bfx_\mcK(\bsxi)\right]^\T\left[ T^{\curl}\hat{ \psi}_J\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \ +\nonumber\\*
-                \ & \int\limits_{\mcK}
+                \ & \int\limits_{\hatK}
                 \left[\curl\left( T^{\curl}\hat{ \psi}_I\right)\circ\bfx_\mcK(\bsxi)\right]^\T\left[\curl \left( T^{\curl}\hat{ \psi}_J\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
                 =\ & \int\limits_{\hatK}
                 \left[\left(\mcJ^{-T}\hat{ \psi}_I\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right]^\T \left[\left(\mcJ^{-T}\hat{ \psi}_J\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \ +\nonumber\\*
-                \ & \int\limits_{\mcK}
+                \ & \int\limits_{\hatK}
                 \left[\left(T^{\div}\widehat{\curl}\hat{ \psi}_I\right)\circ\bfx_\mcK(\bsxi)\right]^\T \left[\left(T^{\div}\widehat{\curl}\hat{ \psi}_J\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
                 =\ & \int\limits_{\hatK}
                 \hat{ \psi}_I(\bsxi)^\T\mcD(\bsxi)\hat{ \psi}_J(\bsxi)|\mcJ(\bsxi)|d^3\bsxi \ +\nonumber\\*
-                \ & \int\limits_{\mcK}
+                \ & \int\limits_{\hatK}
                 \left[\left((|\mcJ|^{-1}\mcJ\widehat{\curl}\hat{ \psi}_I)\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right]^\T \left[\left((|\mcJ|^{-1}\mcJ\widehat{\curl}\hat{ \psi}_J)\circ\bfx_\mcK^{-1}\right)\circ\bfx_\mcK(\bsxi)\right]|\mcJ(\bsxi)|d^3\bsxi \nonumber\\ 
                 =\ & \int\limits_{\hatK}
                 \hat{ \psi}_I(\bsxi)^\T\mcD(\bsxi)\hat{ \psi}_J(\bsxi)|\mcJ(\bsxi)|d^3\bsxi +
-                \int\limits_{\mcK} \left[\widehat{\curl}\hat{ \psi}_I(\bsxi)\right]^\T\mcC(\bsxi)\left[\widehat{\curl}\hat{ \psi}_J(\bsxi)\right]|\mcJ(\bsxi)|^{-1}d^3\bsxi \nonumber \\ 
+                \int\limits_{\hatK} \left[\widehat{\curl}\hat{ \psi}_I(\bsxi)\right]^\T\mcC(\bsxi)\left[\widehat{\curl}\hat{ \psi}_J(\bsxi)\right]|\mcJ(\bsxi)|^{-1}d^3\bsxi \nonumber \\ 
                 =\ & \int\limits_0^1\int\limits_0^1\int\limits_0^1\left\{\hat{ \psi}_I(\bsxi)^\T\mcD(\bsxi)\hat{ \psi}_J(\bsxi)|\mcJ(\bsxi)| +\left[\widehat{\curl}\hat{ \psi}_I(\bsxi)\right]^\T\mcC(\bsxi)\left[\widehat{\curl}\hat{\psi}_J(\bsxi)\right]|\mcJ(\bsxi)|^{-1}\right\} d\xi_3d\xi_2d\xi_1
     \label{hcurlip_coupled}
 \end{align}
@@ -952,13 +977,13 @@ With the assumption that a 3D finite element code enabled for $H(\curl)$ shape f
 \caption{Conventional computation of the $H(\curl)$ Gram Matrix}\label{algo:hcurlconven}
 \begin{algorithmic}
 \Procedure{HcurlGram}{$i_{el},\sfG^{\curl}$}\Comment{Compute matrix $\sfG^{\curl}$ for element No. $i_{el}$ - Conventional algorithm}
-\State\textbf{call }setquadrature3D($i_{el},p_1,p_2,p_3,L,\bsxi_{lmn},w_{lmn}$)
+\State\textbf{call }setquadrature3D($i_{el},p_1,p_2,p_3;L,\{\bsxi_{lmn},w_{lmn}\}$)
 \State $\sfG^{\curl} \gets 0$\Comment{Initialize Gram Matrix}
 \For{$l,m,n=1$  to  $L$}
-            \State\textbf{call } Shape3Hcurl($\bsxi_{lmn},p_1,p_2,p_3,\{\hat{\psi}_I(\bsxi_{lmn})\},\{\widehat{\curl}\hat{\psi}_I(\bsxi_{lmn})\}$)
+            \State\textbf{call } Shape3Hcurl($\bsxi_{lmn},p_1,p_2,p_3;\{\hat{\psi}_I(\bsxi_{lmn})\},\{\widehat{\curl}\hat{\psi}_I(\bsxi_{lmn})\}$)
             \Comment{3D shape functions at $\bsxi_{lmn}$}
-            \State\textbf{call } geometry( $\bsxi_{lmn},mid,\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
-            \Comment{Compute jacobian}
+            \State\textbf{call } geometry( $\bsxi_{lmn},i_{el};\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
+            \Comment{Compute x and Jacobian}
             \State $\mcD\gets\mcJ^{-1}(\bsxi_{lmn})\mcJ^{-T}(\bsxi_{lmn})$
             \State $\mcC\gets\mcJ^\T(\bsxi_{lmn})\mcJ(\bsxi_{lmn})$
             \For{$J=0$  to  $\spacedim Q^p-1$}
@@ -981,7 +1006,7 @@ Now we proceed to define a tensor-product shape function for this energy space. 
     \label{hcurltensor}
 \end{equation}
 %
-where $\hat{\bfe}_a$, $a=1,2,3$, is the $a$-th canonical cartesian unit vector in the master space; the univariate polynomials $\mu_{a,d;i_d}(\xi_d)$, $d=1,2,3$, are determined through the rule
+where $\hat{\bfe}_a$, $a=1,2,3$, is the $a$-th canonical cartesian unit vector in the master space; the univariate polynomials ${\color{blue}\rho_{a,d;i_d}}(\xi_d)$, $d=1,2,3$, are determined through the rule
 \begin{equation}
     \rho_{a,d;i_d}=  \begin{cases}
                     \nu_{i_d}&\text{ if }a=d,\\
@@ -993,9 +1018,9 @@ where $\hat{\bfe}_a$, $a=1,2,3$, is the $a$-th canonical cartesian unit vector i
 Also here the values that the integer indices $i_a,j_a$ may take depend on the vector component where $\hat{\psi}_I$ lies ($a$). The correspondence formula between the tensor-product index $I$ and the one-dimensional ones could be of the form
 \begin{equation}
     I=  \begin{cases}
-            i_1+p_1i_2+p_1(p_2+1)i_3 & \text{ if }$a=1$,\\
-            p_1(p_2+1)(p_3+1)+i_1+(p_1+1)i_2+(p_1+1)p_2i_3 & \text{ if }$a=2$,\\
-            p_1(p_2+1)(p_3+1)+(p_1+1)p_2(p_3+1)+i_1+(p_1+1)i_2+(p_1+1)(p_2+1)i_3 & \text{ if }$a=3$.
+            i_1+p_1i_2+p_1(p_2+1)i_3 & \text{ if }a=1,\\
+            p_1(p_2+1)(p_3+1)+i_1+(p_1+1)i_2+(p_1+1)p_2i_3 & \text{ if }a=2,\\
+            p_1(p_2+1)(p_3+1)+(p_1+1)p_2(p_3+1)+i_1+(p_1+1)i_2+(p_1+1)(p_2+1)i_3 & \text{ if }a=3.
         \end{cases}
         \label{hcurltensorindex}
 \end{equation}
@@ -1020,27 +1045,27 @@ Now, using the Kronecker delta as a means to manage the superscript (\ref{chisup
 % 
 \begin{align}
 \hat{\psi}_I(\xi_1,\xi_2,\xi_3)=&
-\chi_{i_1+\delta_{1a}}^{\langle\delta_{1a}\rangle}(\xi_1)\chi_{i_2+\delta_{2a}}^{\langle\delta_{2a}\rangle}(\xi_2)\chi_{i_3+\delta_{3a}}^{\langle\delta_{3a}\rangle}(\xi_3)\hat{\bfe}_a, \label{curltensor0delta}\\
-\widehat{\curl}\hat{\psi}_I(\xi_1,\xi_2,\xi_3)=& \chi_{i_1+\delta_{1a}}^{\langle1-\delta_{1(a+1)}\rangle}(\xi_1)\chi_{i_2+\delta_{2a}}^{\langle1-\delta_{2(a+1)}\rangle}(\xi_2)\chi_{i_3+\delta_{3a}}^{\langle1-\delta_{3(a+1)}\rangle}(\xi_3)\hat{\bfe}_{a+1}- \nonumber\\* &
-\chi_{i_1+\delta_{1a}}^{\langle1-\delta_{1(a+2)}\rangle}(\xi_1)\chi_{i_2+\delta_{2a}}^{\langle1-\delta_{2(a+2)}\rangle}(\xi_2)\chi_{i_3+\delta_{3a}}^{\langle1-\delta_{3(a+2)}\rangle}(\xi_3)\hat{\bfe}_{a+2}. \label{curltensor1delta}
+\chi_{i_1+\delta_{1a}}^{\langle\delta_{1a}\rangle}(\xi_1)\ \ \chi_{i_2+\delta_{2a}}^{\langle\delta_{2a}\rangle}(\xi_2)\ \ \chi_{i_3+\delta_{3a}}^{\langle\delta_{3a}\rangle}(\xi_3)\ \ \hat{\bfe}_a, \label{curltensor0delta}\\[8pt]
+\widehat{\curl}\hat{\psi}_I(\xi_1,\xi_2,\xi_3)=& \chi_{i_1+\delta_{1a}}^{\langle\gamma_{1(a+1)}\rangle}(\xi_1)\ \ \chi_{i_2+\delta_{2a}}^{\langle\gamma_{2(a+1)}\rangle}(\xi_2)\ \ \chi_{i_3+\delta_{3a}}^{\langle\gamma_{3(a+1)}\rangle}(\xi_3)\ \ \hat{\bfe}_{a+1}- \nonumber\\[4pt] &
+\chi_{i_1+\delta_{1a}}^{\langle\gamma_{1(a+2)}\rangle}(\xi_1)\ \ \chi_{i_2+\delta_{2a}}^{\langle\gamma_{2(a+2)}\rangle}(\xi_2)\ \ \chi_{i_3+\delta_{3a}}^{\langle\gamma_{3(a+2)}\rangle}(\xi_3)\ \ \hat{\bfe}_{a+2}. \label{curltensor1delta}
 \end{align}
 
 By applying (\ref{curltensor0delta}) and (\ref{curltensor1delta}) to the first and second terms of (\ref{hcurlip_coupled}), respectively, we converge to a definite expression that we can finally implement for the computation of the Gram matrix entry $\sfG^{\curl}_{IJ}$. Putting aside momentarily the $|\mcJ|$ factors we have the following equations for each term,
 %
 \begin{align}
     \hat{\psi}_I(\bsxi)^\T\mcD(\bsxi)\hat{\psi}_J(\bsxi)=&
-    \chi_{i_1+\delta_{1a}}^{\langle\delta_{1a}\rangle}(\xi_1)\chi_{j_1+\delta_{1b}}^{\langle\delta_{1b}\rangle}(\xi_1) \chi_{i_2+\delta_{2a}}^{\langle\delta_{2a}\rangle}(\xi_2)\chi_{j_2+\delta_{2b}}^{\langle\delta_{2b}\rangle}(\xi_2) \chi_{i_3+\delta_{3a}}^{\langle\delta_{3a}\rangle}(\xi_3)\chi_{j_3+\delta_{3b}}^{\langle\delta_{3b}\rangle}(\xi_3)
-    \hat{\bfe}_a^\T\mcD(\bsxi)\hat{\bfe}_b,
-    \label{hcurlip_decoupled0}\\
+    \chi_{i_1+\delta_{1a}}^{\langle\delta_{1a}\rangle}(\xi_1)\; \chi_{j_1+\delta_{1b}}^{\langle\delta_{1b}\rangle}(\xi_1)\ \  \chi_{i_2+\delta_{2a}}^{\langle\delta_{2a}\rangle}(\xi_2)\; \chi_{j_2+\delta_{2b}}^{\langle\delta_{2b}\rangle}(\xi_2)\ \  \chi_{i_3+\delta_{3a}}^{\langle\delta_{3a}\rangle}(\xi_3)\; \chi_{j_3+\delta_{3b}}^{\langle\delta_{3b}\rangle}(\xi_3)\ \ 
+    \hat{\bfe}_a^\T\; \mcD(\bsxi)\; \hat{\bfe}_b,
+    \label{hcurlip_decoupled0}\\[8pt]
     \left[\widehat{\curl}\hat{\psi}_I\right]^\T\mcC\left[\widehat{\curl}\hat{\psi}_J\right]=&     
-    \chi_{i_1+\delta_{1a}}^{\langle1-\delta_{1(a+1)}\rangle} \chi_{j_1+\delta_{1b}}^{\langle1-\delta_{1(b+1)}\rangle}  \chi_{i_2+\delta_{2a}}^{\langle1-\delta_{2(a+1)}\rangle} \chi_{j_2+\delta_{2b}}^{\langle1-\delta_{2(b+1)}\rangle}  \chi_{i_3+\delta_{3a}}^{\langle1-\delta_{3(a+1)}\rangle} \chi_{j_3+\delta_{3b}}^{\langle1-\delta_{3(b+1)}\rangle}
-    \hat{\bfe}_{a+1}^\T\mcC\hat{\bfe}_{b+1}-\nonumber\\* &
-    \chi_{i_1+\delta_{1a}}^{\langle1-\delta_{1(a+2)}\rangle} \chi_{j_1+\delta_{1b}}^{\langle1-\delta_{1(b+1)}\rangle}  \chi_{i_2+\delta_{2a}}^{\langle1-\delta_{2(a+2)}\rangle} \chi_{j_2+\delta_{2b}}^{\langle1-\delta_{2(b+1)}\rangle}  \chi_{i_3+\delta_{3a}}^{\langle1-\delta_{3(a+2)}\rangle} \chi_{j_3+\delta_{3b}}^{\langle1-\delta_{3(b+1)}\rangle}
-    \hat{\bfe}_{a+2}^\T\mcC\hat{\bfe}_{b+1}-\nonumber\\* &
-    \chi_{i_1+\delta_{1a}}^{\langle1-\delta_{1(a+1)}\rangle} \chi_{j_1+\delta_{1b}}^{\langle1-\delta_{1(b+2)}\rangle}  \chi_{i_2+\delta_{2a}}^{\langle1-\delta_{2(a+1)}\rangle} \chi_{j_2+\delta_{2b}}^{\langle1-\delta_{2(b+2)}\rangle}  \chi_{i_3+\delta_{3a}}^{\langle1-\delta_{3(a+1)}\rangle} \chi_{j_3+\delta_{3b}}^{\langle1-\delta_{3(b+2)}\rangle}
-    \hat{\bfe}_{a+1}^\T\mcC\hat{\bfe}_{b+2}+\nonumber\\* &
-    \chi_{i_1+\delta_{1a}}^{\langle1-\delta_{1(a+2)}\rangle} \chi_{j_1+\delta_{1b}}^{\langle1-\delta_{1(b+2)}\rangle} \chi_{i_2+\delta_{2a}}^{\langle1-\delta_{2(a+2)}\rangle} \chi_{j_2+\delta_{2b}}^{\langle1-\delta_{2(b+2)}\rangle} \chi_{i_3+\delta_{3a}}^{\langle1-\delta_{3(a+2)}\rangle} \chi_{j_3+\delta_{3b}}^{\langle1-\delta_{3(b+2)}\rangle}
-    \hat{\bfe}_{a+2}^\T\mcC\hat{\bfe}_{b+2}.
+    \chi_{i_1+\delta_{1a}}^{\langle\gamma_{1(a+1)}\rangle} \chi_{j_1+\delta_{1b}}^{\langle\gamma_{1(b+1)}\rangle}\ \   \chi_{i_2+\delta_{2a}}^{\langle\gamma_{2(a+1)}\rangle} \chi_{j_2+\delta_{2b}}^{\langle\gamma_{2(b+1)}\rangle}\ \   \chi_{i_3+\delta_{3a}}^{\langle\gamma_{3(a+1)}\rangle} \chi_{j_3+\delta_{3b}}^{\langle\gamma_{3(b+1)}\rangle}\ \ 
+    \hat{\bfe}_{a+1}^\T\;\mcC\;\hat{\bfe}_{b+1}-\nonumber\\[4pt] &
+    \chi_{i_1+\delta_{1a}}^{\langle\gamma_{1(a+2)}\rangle} \chi_{j_1+\delta_{1b}}^{\langle\gamma_{1(b+1)}\rangle}\ \   \chi_{i_2+\delta_{2a}}^{\langle\gamma_{2(a+2)}\rangle} \chi_{j_2+\delta_{2b}}^{\langle\gamma_{2(b+1)}\rangle}\ \   \chi_{i_3+\delta_{3a}}^{\langle\gamma_{3(a+2)}\rangle} \chi_{j_3+\delta_{3b}}^{\langle\gamma_{3(b+1)}\rangle}\ \ 
+    \hat{\bfe}_{a+2}^\T\;\mcC\;\hat{\bfe}_{b+1}-\nonumber\\[4pt] &
+    \chi_{i_1+\delta_{1a}}^{\langle\gamma_{1(a+1)}\rangle} \chi_{j_1+\delta_{1b}}^{\langle\gamma_{1(b+2)}\rangle}\ \   \chi_{i_2+\delta_{2a}}^{\langle\gamma_{2(a+1)}\rangle} \chi_{j_2+\delta_{2b}}^{\langle\gamma_{2(b+2)}\rangle}\ \   \chi_{i_3+\delta_{3a}}^{\langle\gamma_{3(a+1)}\rangle} \chi_{j_3+\delta_{3b}}^{\langle\gamma_{3(b+2)}\rangle}\ \ 
+    \hat{\bfe}_{a+1}^\T\;\mcC\;\hat{\bfe}_{b+2}+\nonumber\\[4pt] &
+    \chi_{i_1+\delta_{1a}}^{\langle\gamma_{1(a+2)}\rangle} \chi_{j_1+\delta_{1b}}^{\langle\gamma_{1(b+2)}\rangle}\ \  \chi_{i_2+\delta_{2a}}^{\langle\gamma_{2(a+2)}\rangle} \chi_{j_2+\delta_{2b}}^{\langle\gamma_{2(b+2)}\rangle}\ \  \chi_{i_3+\delta_{3a}}^{\langle\gamma_{3(a+2)}\rangle} \chi_{j_3+\delta_{3b}}^{\langle\gamma_{3(b+2)}\rangle}\ \ 
+    \hat{\bfe}_{a+2}^\T\;\mcC\;\hat{\bfe}_{b+2}.
     \label{hcurlip_decoupled1}    
 \end{align}
 
@@ -1048,17 +1073,17 @@ Note that in the second equation the arguments were omitted for practical reason
 % 
 \begin{align}
     \mcG^{\curl A;\alpha \beta}_{ab;i_3j_3}(\xi_1,\xi_2)=&\int\limits_0^1
-    \chi_{i_3+\delta_{3a}}^{\langle1-\delta_{3(a+\alpha)}\rangle}(\xi_3)
-    \chi_{j_3+\delta_{3b}}^{\langle1-\delta_{3(b+\beta )}\rangle}(\xi_3) C_{(a+\alpha)(b+\beta)}(\xi_1,\xi_2,\xi_3)|\mcJ(\xi_1,\xi_2,\xi_3)|^{-1}d\xi_3,
+    \chi_{i_3+\delta_{3a}}^{\langle\gamma_{3(a+\alpha)}\rangle}(\xi_3)\ 
+    \chi_{j_3+\delta_{3b}}^{\langle\gamma_{3(b+\beta )}\rangle}(\xi_3)\  C_{(a+\alpha)(b+\beta)}(\xi_1,\xi_2,\xi_3)\ |\mcJ(\xi_1,\xi_2,\xi_3)|^{-1}d\xi_3,
     \label{GA_hcurl1}\\
     \mcG^{\curl B;\alpha \beta}_{ab;i_2j_2i_3j_3}(\xi_1)=&\int\limits_0^1
-    \chi_{i_2+\delta_{2a}}^{\langle1-\delta_{2(a+\alpha)}\rangle}(\xi_2)
-    \chi_{j_2+\delta_{2b}}^{\langle1-\delta_{2(b+\beta )}\rangle}(\xi_2)
+    \chi_{i_2+\delta_{2a}}^{\langle\gamma_{2(a+\alpha)}\rangle}(\xi_2)\ 
+    \chi_{j_2+\delta_{2b}}^{\langle\gamma_{2(b+\beta )}\rangle}(\xi_2)\ 
     \mcG^{\curl A;\alpha \beta}_{ab;i_3j_3}(\xi_1,\xi_2)d\xi_2,
     \label{GB_hcurl1}\\
     \mcG^{\curl;\alpha \beta}_{ab;i_1j_1i_2j_2i_3j_3}=&\int\limits_0^1
-    \chi_{i_1+\delta_{1a}}^{\langle1-\delta_{1(a+\alpha)}\rangle}(\xi_1)
-    \chi_{j_1+\delta_{1b}}^{\langle1-\delta_{1(b+\beta )}\rangle}(\xi_1)
+    \chi_{i_1+\delta_{1a}}^{\langle\gamma_{1(a+\alpha)}\rangle}(\xi_1)\ 
+    \chi_{j_1+\delta_{1b}}^{\langle\gamma_{1(b+\beta )}\rangle}(\xi_1)\ 
     \mcG^{\curl B;\alpha \beta}_{ab;i_2j_2i_3j_3}(\xi_1)d\xi_1,
     \label{ip_hcurl1_GAB}    
 \end{align}
@@ -1066,14 +1091,14 @@ Note that in the second equation the arguments were omitted for practical reason
 where $\alpha,\beta=1,2$. In the same fashion, for the first term the auxiliary functions are
 \begin{align}
     \check{\mcG}^{\curl A}_{ab;i_3j_3}(\xi_1,\xi_2)=&\int\limits_0^1
-    \chi_{i_3+\delta_{3a}}^{\langle\delta_{3a}\rangle}(\xi_3) \chi_{j_3+\delta_{3b}}^{\langle\delta_{3b}\rangle}(\xi_3) D_{ab}(\xi_1,\xi_2,\xi_3)|\mcJ(\xi_1,\xi_2,\xi_3)|d\xi_3,
+    \chi_{i_3+\delta_{3a}}^{\langle\delta_{3a}\rangle}(\xi_3)\  \chi_{j_3+\delta_{3b}}^{\langle\delta_{3b}\rangle}(\xi_3)\  D_{ab}(\xi_1,\xi_2,\xi_3)\ |\mcJ(\xi_1,\xi_2,\xi_3)|d\xi_3,
     \label{GA_hcurl0}\\
     \check{\mcG}^{\curl B}_{ab;i_2j_2i_3j_3}(\xi_1)=&\int\limits_0^1
-    \chi_{i_2+\delta_{2a}}^{\langle\delta_{2a}\rangle}(\xi_2) \chi_{j_2+\delta_{2b}}^{\langle\delta_{2b}\rangle}(\xi_2)
+    \chi_{i_2+\delta_{2a}}^{\langle\delta_{2a}\rangle}(\xi_2)\  \chi_{j_2+\delta_{2b}}^{\langle\delta_{2b}\rangle}(\xi_2)\ 
     \check{\mcG}^{\curl A}_{ab;i_3j_3}(\xi_1,\xi_2)d\xi_2,
     \label{GB_hcurl0}\\
     \check{\mcG}^{\curl}_{ab;i_1j_1i_2j_2i_3j_3}=&\int\limits_0^1
-    \chi_{i_1+\delta_{1a}}^{\langle\delta_{1a}\rangle}(\xi_1) \chi_{j_1+\delta_{1b}}^{\langle\delta_{1a}\rangle}(\xi_1)
+    \chi_{i_1+\delta_{1a}}^{\langle\delta_{1a}\rangle}(\xi_1)\  \chi_{j_1+\delta_{1b}}^{\langle\delta_{1b}\rangle}(\xi_1)\ 
     \check{\mcG}^{\curl B}_{ab;i_2j_2i_3j_3}(\xi_1)d\xi_1,
     \label{ip_hcurl0_GAB}
 \end{align}
@@ -1082,39 +1107,41 @@ Finally, every Gram matrix entry is computed as
 %
 \begin{equation}
     \sfG_{IJ}^{\curl}=
-    \check{\mcG}^{\curl}_{ab;i_1j_1i_2j_2i_3j_3}+ \sum\limits_{\alpha,\beta=1}^{2}(-1)^{\alpha+\beta}\mcG^{\curl;\alpha \beta}_{ab;i_1j_1i_2j_2i_3j_3}.
+    \check{\mcG}^{\curl}_{ab;i_1j_1i_2j_2i_3j_3}+ \sum\limits_{\alpha,\beta=1}^{2}(-1)^{\alpha+\beta}\;\mcG^{\curl;\alpha \beta}_{ab;i_1j_1i_2j_2i_3j_3}.
     \label{ip_hcurl_GAB}
 \end{equation}
 
 Algorithm \ref{algo:hcurltensor} implements (\ref{GA_hcurl1})-(\ref{ip_hcurl_GAB}) using one-dimensional numerical integration for each auxiliary function. If we have a uniform-degree polynomial space (in the sense of the exact sequence), then this algorithm has a complexity of $\mcO[p^3(p+1)^4]\sim \mcO(p^7)$ whereas Algorithm \ref{algo:hcurlconven} accounts for $\mcO[p^5(p+1)^4]\sim \mcO(p^9)$, assuming we use $L=p$ quadrature points.
 %
+
 \begin{algorithm}[ht!]
 \caption{Computation of the $H(\curl)$ Gram Matrix by sum factorization}\label{algo:hcurltensor}
+% \algsetup{indent=1em}
 \begin{algorithmic}
 \Procedure{HcurlGramTensor}{$i_{el},\sfG^{\curl}$}\Comment{$\sfG^{\curl}$ for element No. $i_{el}$ - Sum factorization}
 \State $p_{\max}\gets\max\{p_1,p_2,p_3\}$
-\State\textbf{call }setquadrature1D($i_{el},p_{\max},L,\zeta^l,w^l$)
+\State\textbf{call }setquadrature1D($i_{el},p_{\max};L,\{\zeta^l,w^l\}$)
 
-\State $\check{\mcG}^{\grad},\mcG^{\grad}\gets 0$\Comment{Initialize Gram Matrix}
+\State $\check{\mcG}^{\curl},\mcG^{\curl}\gets 0$\Comment{Initialize Gram Matrix}
 \For{$l=1$  to  $L$}    
-    \State\textbf{call } Shape1H1($\zeta^l,p_1,\chi_{i_1}(\zeta^l),\chi_{i_1}'(\zeta^l)\}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
+    \State\textbf{call } Shape1H1($\zeta^l,p_1;\{\chi_{i_1}(\zeta^l),\chi_{i_1}'(\zeta^l)\}$) \Comment{Evaluate 1D shape functions at $\zeta^l$}
     \For{$j_3,i_3=0$  to  $p_3$}        
             \State $\check{\mcG}^{\curl B},\mcG^{\curl B}\gets 0$
             \For{$m=1$  to  $L$}
-                \State\textbf{call } Shape1H1($\zeta^m,p_2,\chi_{i_2}(\zeta^m),\chi_{i_2}'(\zeta^m)\}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
+                \State\textbf{call } Shape1H1($\zeta^m,p_2;\{\chi_{i_2}(\zeta^m),\chi_{i_2}'(\zeta^m)\}$) \Comment{Evaluate 1D shape functions at $\zeta^m$}
                 \State $\check{\mcG}^{\curl A},\mcG^{\curl A}\gets 0$
                 \For{$n=1$  to  $L$}
-                    \State\textbf{call } Shape1H1($\zeta^n,p_3,\chi_{i_3}(\zeta^n),\chi_{i_3}'(\zeta^n)\}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
+                    \State\textbf{call } Shape1H1($\zeta^n,p_3;\{\chi_{i_3}(\zeta^n),\chi_{i_3}'(\zeta^n)\}$) \Comment{Evaluate 1D shape functions at $\zeta^n$}
                     \State $\bsxi_{lmn}\gets (\zeta^l,\zeta^m,\zeta^n)$
-                    \State\textbf{call } geometry( $\bsxi_{lmn},mid,\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
-                    \Comment{Compute jacobian}
+                    \State\textbf{call } geometry( $\bsxi_{lmn},i_{el};\bfx,\mcJ(\bsxi_{lmn}),\mcJ^{-1}(\bsxi_{lmn}),|\mcJ|$)
+                    \Comment{Compute x and Jacobian}
                     \State $\mcD\gets\mcJ^{-1}(\bsxi_{lmn})\mcJ^{-T}(\bsxi_{lmn})$
                     \State $\mcC\gets\mcJ^\T(\bsxi_{lmn})\mcJ(\bsxi_{lmn})$
                     \For{$a,b=1$  to  $3$}
                         \If{$j_3+\delta_{3b}\leq p_3$ and $i_3+\delta_{3a}\leq p_3$}\Comment{Avoids extra computations}
-                            \State$\check{\mcG}_{ab;i_3j_3}^{A}\gets \check{\mcG}_{ab;i_3j_3}^{A} + \chi_{i_3+\delta_{3a}}^{\langle\delta_{3a}\rangle}(\zeta^n) \chi_{j_3+\delta_{3b}}^{\langle\delta_{3b}\rangle}(\zeta^n)D_{ab} |\mcJ| w^n$
+                            \State$\check{\mcG}_{ab;i_3j_3}^{\curl A}\gets \check{\mcG}_{ab;i_3j_3}^{\curl A} + \chi_{i_3+\delta_{3a}}^{\langle\delta_{3a}\rangle}(\zeta^n) \chi_{j_3+\delta_{3b}}^{\langle\delta_{3b}\rangle}(\zeta^n)D_{ab} |\mcJ| w^n$
                             \For{$\alpha,\beta=1$  to  $2$}
-                            \State$\mcG_{ab;i_3j_3}^{\curl A;\alpha \beta}\gets \mcG_{ab;i_3j_3}^{\curl A;\alpha \beta} + \chi_{i_3+\delta_{3a}}^{\langle1-\delta_{3a}\rangle}(\zeta^n) \chi_{j_3+\delta_{3b}}^{\langle1-\delta_{3b}\rangle}(\zeta^n) C_{(a+\alpha)(b+\beta)} |\mcJ|^{-1} w^n$ \Comment{(\ref{GA_hcurl1})}
+                                \State$\mcG_{ab;i_3j_3}^{\curl A;\alpha \beta}\gets \mcG_{ab;i_3j_3}^{\curl A;\alpha \beta} + \chi_{i_3+\delta_{3a}}^{\langle\gamma_{3a}\rangle}(\zeta^n) \chi_{j_3+\delta_{3b}}^{\langle\gamma_{3b}\rangle}(\zeta^n) C_{(a+\alpha)(b+\beta)} |\mcJ|^{-1} w^n$ \Comment{(\ref{GA_hcurl1})}
                             \EndFor
                         \EndIf
                     \EndFor
@@ -1122,9 +1149,9 @@ Algorithm \ref{algo:hcurltensor} implements (\ref{GA_hcurl1})-(\ref{ip_hcurl_GAB
                 \For{$j_2,i_2=0$  to  $p_2$}
                         \For{$a,b=1$  to  $3$}
                                 \If{$j_2+\delta_{2b}\leq p_2$ and $i_2+\delta_{2a}\leq p_2$}\Comment{Avoids extra computations}
-                                    \State$\check{\mcG}_{ab;i_2j_2i_3j_3}^{B}\gets \check{\mcG}_{ab;i_2j_2i_3j_3}^{B} + \chi_{i_2+\delta_{2a}}^{\langle\delta_{2a}\rangle}(\zeta^m) \chi_{j_2+\delta_{2b}}^{\langle\delta_{2b}\rangle}(\zeta^m) \check{\mcG}_{ab;i_3j_3}^{A} w^m$
+                                    \State$\check{\mcG}_{ab;i_2j_2i_3j_3}^{\curl B}\gets \check{\mcG}_{ab;i_2j_2i_3j_3}^{\curl B} + \chi_{i_2+\delta_{2a}}^{\langle\delta_{2a}\rangle}(\zeta^m) \chi_{j_2+\delta_{2b}}^{\langle\delta_{2b}\rangle}(\zeta^m) \check{\mcG}_{ab;i_3j_3}^{\curl A} w^m$
                                     \For{$\alpha,\beta=1$  to  $2$}
-                                    \State$\mcG_{ab;i_2j_2i_3j_3}^{\curl B;\alpha \beta}\gets \mcG_{ab;i_2j_2i_3j_3}^{\curl B;\alpha \beta} + \chi_{i_2+\delta_{2a}}^{\langle1-\delta_{2a}\rangle}(\zeta^m) \chi_{j_2+\delta_{2b}}^{\langle1-\delta_{2b}\rangle}(\zeta^m) \mcG_{ab;i_3j_3}^{\curl A;\alpha \beta} w^m$ \Comment{(\ref{GB_hcurl1})}
+                                    \State$\mcG_{ab;i_2j_2i_3j_3}^{\curl B;\alpha \beta}\gets \mcG_{ab;i_2j_2i_3j_3}^{\curl B;\alpha \beta} + \chi_{i_2+\delta_{2a}}^{\langle\gamma_{2a}\rangle}(\zeta^m) \chi_{j_2+\delta_{2b}}^{\langle\gamma_{2b}\rangle}(\zeta^m) \mcG_{ab;i_3j_3}^{\curl A;\alpha \beta} w^m$ \Comment{(\ref{GB_hcurl1})}
                                     \EndFor
                                 \EndIf
                         \EndFor       
@@ -1136,9 +1163,9 @@ Algorithm \ref{algo:hcurltensor} implements (\ref{GA_hcurl1})-(\ref{ip_hcurl_GAB
                             \If{$J\geq I$}
                                 \For{$a,b=1$  to  $3$}
                                         \If{$j_1+\delta_{1b}\leq p_1$ and $i_1+\delta_{1a}\leq p_1$}\Comment{Avoids extra computations}
-                                            \State$\check{\mcG}_{ab;i_1j_1i_2j_2i_3j_3}\gets \check{\mcG}_{ab;i_1j_1i_2j_2i_3j_3} + \chi_{i_1+\delta_{1a}}^{\langle\delta_{1a}\rangle}(\zeta^l) \chi_{j_1+\delta_{1b}}^{\langle\delta_{1b}\rangle}(\zeta^l) \check{\mcG}_{ab;i_2j_2i_3j_3}^{B} w^l$
+                                            \State$\check{\mcG}_{ab;i_1j_1i_2j_2i_3j_3}^{\curl}\gets \check{\mcG}_{ab;i_1j_1i_2j_2i_3j_3}^{\curl} + \chi_{i_1+\delta_{1a}}^{\langle\delta_{1a}\rangle}(\zeta^l) \chi_{j_1+\delta_{1b}}^{\langle\delta_{1b}\rangle}(\zeta^l) \check{\mcG}_{ab;i_2j_2i_3j_3}^{\curl B} w^l$
                                             \For{$\alpha,\beta=1$  to  $2$}
-                                            \State$\mcG_{ab;i_1j_1i_2j_2i_3j_3}^{\curl;\alpha \beta}\gets \mcG_{ab;i_1j_1i_2j_2i_3j_3}^{\curl;\alpha \beta} + \chi_{i_1+\delta_{1a}}^{\langle1-\delta_{1a}\rangle}(\zeta^l) \chi_{j_1+\delta_{1b}}^{\langle1-\delta_{1b}\rangle}(\zeta^l) \mcG_{ab;i_2j_2i_3j_3}^{\curl B;\alpha \beta} w^l$                                             
+                                            \State$\mcG_{ab;i_1j_1i_2j_2i_3j_3}^{\curl;\alpha \beta}\gets \mcG_{ab;i_1j_1i_2j_2i_3j_3}^{\curl;\alpha \beta} + \chi_{i_1+\delta_{1a}}^{\langle\gamma_{1a}\rangle}(\zeta^l) \chi_{j_1+\delta_{1b}}^{\langle\gamma_{1b}\rangle}(\zeta^l) \mcG_{ab;i_2j_2i_3j_3}^{\curl B;\alpha \beta} w^l$                                             
                                             \EndFor
                                         \EndIf
                                 \EndFor
@@ -1155,7 +1182,7 @@ Algorithm \ref{algo:hcurltensor} implements (\ref{GA_hcurl1})-(\ref{ip_hcurl_GAB
 
 \subsection{Use of Legendre polynomials}
 \label{usinglegendre}
-Legendre polynomials are a family of hierarchical and $L^2$ orthogonal polynomials defined over the interval [-1,1], with the average zero property (except the constant function corresponding to $0^\text{th}$ degree). By shifting the polynomial argument we can keep all those properties over the interval [0,1]. We are denoting by $P_i$ the $i^\text{th}$-degree Legendre polynomial, with $i=0,1,2,...$. Just by defining the first two members of the set along with a recursion formula, we can obtain all of the Legendre polynomial family over the closed master interval.
+Legendre polynomials are a family of hierarchical and $L^2$ orthogonal polynomials defined over the interval [-1,1], with the average zero property (except the constant function corresponding to $0^\text{th}$ degree). By shifting the polynomial argument we can keep all those properties over the interval [0,1]. We are denoting by $P_i$ the $i^\text{th}$-degree Legendre polynomial, with $i=0,1,2,...$. Just by defining the first two members of the set along with a recursion formula, we can obtain all of the Legendre polynomial family over [0,1].
 % 
 \begin{align}
     P_0(\xi)&=1 \label{leg0} \\
@@ -1173,16 +1200,16 @@ Additionally, the mentioned properties of the Legendre polynomials are formally 
     \end{equation}
     \item Orthogonality
     \begin{equation}
-        \left(P_i,P_j\right)_{L^2(\mcI)}=\int\limits_0^1 P_i(\xi)P_j(\xi)d\xi=\delta_{ij}\frac{1}{2i+1},\ \ i,j\geq 0,\label{orth_leg}
+        \left(P_i,P_j\right)_{L^2(\mcI)}=\int\limits_0^1 P_i(\xi)P_j(\xi)d\xi=\delta_{ij}\frac{1}{2i+1},\ \ i,j\geq 0.\label{orth_leg}
     \end{equation}
-    with $\delta_{ij}$ being the Kronecker delta.
+    % with $\delta_{ij}$ being the Kronecker delta.
     \item Average zero
     \begin{equation}
         \int\limits_0^1 P_i(\xi)d\xi=0,\ \ i\geq 1. \label{avgzero}
     \end{equation}    
 \end{enumerate}
-
-Another useful property derived from (\ref{leg0})-(\ref{legendre_rec}) is that Legendre polynomials of odd degree are odd with respect to the line $\xi=1/2$, and similarly those of even index are even with respect to that line.
+% 
+% Another useful property derived from (\ref{leg0})-(\ref{legendre_rec}) is that Legendre polynomials of odd degree are odd with respect to the line $\xi=1/2$, and similarly those of even index are even with respect to that line.
 
 However, we usually need to evaluate derivatives of the shape functions. In that sense, it would be preferable to have all the nice properties of Legendre polynomials in the derivatives of our shape functions. This motivates the introduction of the integrated Legendre polynomials, defined as:
 % 
@@ -1203,7 +1230,8 @@ Notice that (\ref{avgzero}) and (\ref{int_legendre}) imply that $L_i(0)=L_i(1)=0
     2(2i-1)L_i(\xi)&=P_i(\xi)-P_{i-2}(\xi),\ \ i\geq 2.\label{intlegendre_rec}
 \end{align}
 
-This recursive definition means that, for $i\geq2$, the property of being either even or odd with respect to $\xi=1/2$ correspondingly to their indices still holds. Finally, we can also do a bit of notation abuse and add a new function to this family:
+% This recursive definition means that, for $i\geq2$, the property of being either even or odd with respect to $\xi=1/2$ correspondingly to their indices still holds. 
+Finally, we can also do a bit of notation abuse and add a new function to this family:
 % 
 \begin{align}
     L_0(\xi)&=1-\xi=1-L_1(\xi). \label{affine0}
@@ -1215,4 +1243,11 @@ The definition of this additional function has the purpose of completing a full 
     \mcP^n([0,1])=\spann\{L_0,...,L_n\},\ \ n=1,2,3,...\label{hier_intleg}
 \end{equation}
 
-For the 1D $W^p_{\mcI}$ space take $\chi_i=L_i$, $i=0,1,...,p$, therefore we are satisfying the requirement (\ref{hierarchicalrelation}) thanks to (\ref{intleg_deriv}). In other words, if the 1D $H^1$ shape functions are integrated Legendre polynomials we comply with the hierarchical basis property, making the algorithms developed above directly applicable. Thus, for our computations this polynomial family will be the constructing block of every finite element space that we have presented earlier.
+For the 1D $W^p_{\mcI}$ space take $\chi_i=L_i$, $i=0,1,...,p$, therefore we are satisfying the requirement (\ref{hierarchicalrelation}) thanks to (\ref{intleg_deriv}). In other words, if the 1D $H^1$ shape functions are integrated Legendre polynomials we comply with the hierarchical basis property, making the algorithms developed above directly applicable. 
+This polynomial family will therefore be the constructing block of every finite element space that we have presented above.
+
+{\color{blue}
+\begin{remark}
+\emph{A side note on conformity using integrated Legendre polynomials}: Notice that across two adjacent elements the union of functions $L_0$ and $L_1$ would form what is known as a \emph{hat} function. In an $H_1$-conforming discretization, this kind of function is in charge of enforcing continuity at vertices. On the other hand, the higher-order integrated Legendre polynomials ($L_i,\ i\geq2$) are \emph{bubbles}, that is, they vanish at endpoints. Consequently, the finite element solution value at vertices is fully determined by the coefficients for $L_0$ and $L_1$. Conformity in 1D is so guaranteed at the lowest order case and at any higher order. For the 3D case, by recalling the ideas in Subsection \ref{subsec:tensor_fe}, it can be shown that after constructing the 3D spaces with the 1D spaces in the way therein shown, conformity is also attained.
+\end{remark}
+}
